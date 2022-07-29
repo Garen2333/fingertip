@@ -1,0 +1,14 @@
+Instructions: update file version in user_config/user_profiles_config.h
+line 99
+
+Also update device name in user_config.h
+#define USER_DEVICE_NAME        "DLG-OB1203-v1.6"
+
+
+Then in the js file put this in after the comments:
+
+const latest_firmware_revision = 'v1.6';
+
+const latest_firmware = [
+
+Instead of 
