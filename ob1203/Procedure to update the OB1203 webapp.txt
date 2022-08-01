@@ -10,7 +10,7 @@ Sign in using Renesas credentials: full email address and password
 The repo is here:
 https://gitlab.eng.idt.com/dallen/ob1203sd-bt2-evk-2022
 3. Increment the version number in the file user_config/user_profiles_config.h, line 99. Also update device name in user_config.h #define USER_DEVICE_NAME        "DLG-OB1203-v1.6"
-4. Once you have a new binary, you need to convert the binary in the objects file to a JSON format using the python script fileimport.py.
+4. Once you have a new binary, you need to convert the binary in the objects file to a javascript file that puts the binary in a JSON format using the python script fileimport.py.
 5. Open fileimport.py using notepad or notepad++ etc. Increment the version number on line 31 to match the number you chose in step 3. Save the python script
 6. Delete the file latest_firmware.js. You will be creating a new one.
 7. Run the python script. Type ble_app_plx_531. Press enter. You now have a new latest_firmware.js file.
