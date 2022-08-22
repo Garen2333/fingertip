@@ -2,7 +2,7 @@ Procedure to update the OB1203 webapp.
 
 Make sure a given device can do SUOTA (if blank or programmed with non-suota version
 1. Connect debugger to Renesas board (use one that doesn't have the reset pin connected)
-2. open Smart Snippets Toolbox
+2. open Smart Snippets Toolbox v5.0.10 etc --the old version
 3. Choose DA14531 using the JTAG interface
 4. Choose the file ob1203_v150_multi_img.bin
 5. deselect bootable
@@ -11,7 +11,9 @@ Make sure a given device can do SUOTA (if blank or programmed with non-suota ver
 8. erase
 9. burn and verify
 10.power cycle chip
+The file is here: C:\Users\a5114632\git\BP\renesas-bio.github.io\ob1203 in the local repo as well, or on the remote github repo at renesas-bio.
 
+The login name is renesas-bio and the password is RenesasNumber1.
 
 1. Login to Github as renesas-bio using the password RenesasNumber1
 2. Generate the new binary by compiling the Keil project. My project is currently located on my local repository at C:\DiaSemi\DA145xx_SDK\6.0.14.1114\projects\target_apps\ble_examples\ble_app_plx\Keil_5\out_DA14531\Objects.
