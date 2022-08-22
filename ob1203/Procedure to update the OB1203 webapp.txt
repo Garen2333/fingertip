@@ -16,21 +16,20 @@ The file is here: C:\Users\a5114632\git\BP\renesas-bio.github.io\ob1203 in the l
 The login name is renesas-bio and the password is RenesasNumber1.
 
 1. Login to Github as renesas-bio using the password RenesasNumber1
-2. Generate the new binary by compiling the Keil project. My project is currently located on my local repository at C:\DiaSemi\DA145xx_SDK\6.0.14.1114\projects\target_apps\ble_examples\ble_app_plx\Keil_5\out_DA14531\Objects.
+2. Generate the new binary by compiling the Keil project. My project is currently located on my local repository at C:\DiaSemi\DA145xx_SDK\6.0.14.1114\projects\target_apps\ble_examples\ble_app_plx_gitlab\Keil_5\out_DA14531\Objects.
 There is also a remote repo on Renesas Gitlab.
 Get an account by making an IT request.
 https://gitlab.eng.idt.com/users/sign_in
 Sign in using Renesas credentials: full email address and password
-
 The repo is here:
 https://gitlab.eng.idt.com/dallen/ob1203sd-bt2-evk-2022
 3. Increment the version number in the file user_config/user_profiles_config.h, line 99.
 4. Also update device name in user_config.h #define USER_DEVICE_NAME        "DLG-OB1203-v1.6"
-5. Once you have a new binary, you need to convert the binary in the objects file to a javascript file that puts the binary in a JSON format using the python script fileimport.py.
+5. Once you have a new binary, you need to convert the binary in the objects file to a javascript file that puts the binary in a JSON format using the python script fileimport.py. You need to copy the binary to the local renesas-bio repo: C:\Users\a5114632\git\BP\renesas-bio.github.io\ob1203 and then:
 6. Open fileimport.py using notepad or notepad++ etc. Increment the version number on line 31 to match the number you chose in step 3. Save the python script
 7. Delete the file latest_firmware.js. You will be creating a new one.
-8. Run the python script. Type ble_app_plx_531. Press enter. You now have a new latest_firmware.js file.
-9. Copy the output file latest_firmware.js to the directory with the web code, for instance C:\Users\a5114632\git\BP\renesas-bio.github.io or to the repo or clone of the repo at https://github.com/renesas-bio/renesas-bio.github.io. Update the repo.
+8. Run the python script. Type ble_app_plx_531. (don't copy and past that file name it is buggy if you do that) Press enter. You now have a new latest_firmware.js file. 
+9. Update the repo by commiting the change and pushing to the remote repo (origin).
 10. Navigate to renesas-bio.github.io/ob1203/ob1203.html and refresh the browser every couple of minutes until it updates.
 
 
