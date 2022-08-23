@@ -28,7 +28,7 @@ localtime = time.asctime( time.localtime(time.time()) )
 s =  "// Binary image\n"
 s += "// Generated: " + localtime + "\n"
 s += "// File name: " + file_name + ".bin\n\n"
-s += "\nconst latest_firmware_revision = 'v1.7';" #increment this number to a new version!!!!!!
+s += "\nconst latest_firmware_revision = 'v1.8';" #increment this number to a new version!!!!!!
 s += "\nconst latest_firmware = [\n\t"
 
 # Convert all data bytes to a hex string
