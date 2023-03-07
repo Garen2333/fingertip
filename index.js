@@ -303,9 +303,8 @@ async function ble_connect() {
         log('Requesting Bluetooth Device...');
         /*TODO: change the name of device and UUID*/
         device = await navigator.bluetooth.requestDevice({
-            //filters: [{ name: 'WB5M DK' }]
+            filters: [{ name: 'WB5M DK' }]
             //optionalServices: [BPP_SVC_UUID]
-            acceptAllDevices: true
         });
         device.addEventListener('gattserverdisconnected', onDisconnected);
         // Connect to device GATT and perform attribute discovery
