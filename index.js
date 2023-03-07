@@ -4,7 +4,7 @@ var device;
 var packet_count = 0;
 
 // Define the CodeLess UUIDs 
-var BPP_SVC_UUID = "0783b03e-8535-b5a0-7140-a304d2495cb7";
+var BPP_SVC_UUID = "00000000-0001-11e1-9ab4-0002a5d5c51b";
 var RX_CHAR_UUID   = "0783b03e-8535-b5a0-7140-a304d2495cb8";
 var TX_CHAR_UUID = "0783b03e-8535-b5a0-7140-a304d2495cba";
 
@@ -301,8 +301,9 @@ async function ble_connect() {
     try {
         // Define a scan filter and prepare for interaction with Codeless Service
         log('Requesting Bluetooth Device...');
+        /*TODO: change the name of device and UUID*/
         device = await navigator.bluetooth.requestDevice({
-            filters: [{ name: 'BPP' }],
+            filters: [{ name: 'WB5M DK' }],
             optionalServices: [BPP_SVC_UUID]
         });
         device.addEventListener('gattserverdisconnected', onDisconnected);
