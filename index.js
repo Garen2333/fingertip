@@ -5,8 +5,8 @@ var packet_count = 0;
 
 // Define the CodeLess UUIDs 
 var BPP_SVC_UUID = "00000000-0001-11e1-9ab4-0002a5d5c51b";
-var RX_CHAR_UUID   = "0783b03e-8535-b5a0-7140-a304d2495cb8";
-var TX_CHAR_UUID = "0783b03e-8535-b5a0-7140-a304d2495cba";
+var RX_CHAR_UUID   = "0000fe41-8e22-4541-9d4c-21edae82ed19";
+var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 
 var no_data_yet = true;
 
@@ -40,6 +40,8 @@ var dataLog = "";
 var downsample = 0;
 
 var settingsArr = new Uint8Array(8);
+
+var startArr = new Uint8Array(10);
 
 var test_chart_len = 500;
 
@@ -314,8 +316,9 @@ async function ble_connect() {
         const txChar = await service.getCharacteristic(TX_CHAR_UUID);
 
         createSettings();
+        createStart();
 
-        txChar.writeValue(settingsArr);
+        txChar.writeValue(startArr);
         // Subscribe to notifications
         await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
@@ -381,6 +384,21 @@ function createSettings() {
     alg_mode = settingsArr[6];
 
     calcChecksum();
+}
+
+function createStart(){
+    //"swvstart\r\n" 
+    startArr[0] = 's'.charCodeAt(0);
+    startArr[1] = 'w'.charCodeAt(0);
+    startArr[2] = 'v'.charCodeAt(0);
+    startArr[3] = 's'.charCodeAt(0);
+    startArr[4] = 't'.charCodeAt(0);
+    startArr[5] = 'a'.charCodeAt(0);
+    startArr[6] = 'r'.charCodeAt(0);
+    startArr[7] = 't'.charCodeAt(0);
+    startArr[8] = '\r'.charCodeAt(0);
+    startArr[9] = '\n'.charCodeAt(0);
+
 }
 
 function adjust_width() {
