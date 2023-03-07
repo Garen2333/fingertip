@@ -298,6 +298,11 @@ async function bleDisconnect() {
 
 // Scan, connect and explore CodeLess BLE device
 async function ble_connect() {
+    var bluetoothDevices;
+    bluetoothDevices = navigator.bluetooth.getDevices();
+    for(var dev in bluetoothDevices){
+        log(dev.name);
+    }
     try {
         // Define a scan filter and prepare for interaction with Codeless Service
         log('Requesting Bluetooth Device...');
