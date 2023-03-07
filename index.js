@@ -298,17 +298,12 @@ async function bleDisconnect() {
 
 // Scan, connect and explore CodeLess BLE device
 async function ble_connect() {
-    var bluetoothDevices;
-    bluetoothDevices = navigator.bluetooth.getDevices();
-    for(var dev in bluetoothDevices){
-        log(dev.name);
-    }
     try {
         // Define a scan filter and prepare for interaction with Codeless Service
         log('Requesting Bluetooth Device...');
         /*TODO: change the name of device and UUID*/
         device = await navigator.bluetooth.requestDevice({
-            filters: [{ name: 'WB5M DK' }]
+            //filters: [{ name: 'WB5M DK' }]
             //optionalServices: [BPP_SVC_UUID]
         });
         device.addEventListener('gattserverdisconnected', onDisconnected);
