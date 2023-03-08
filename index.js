@@ -172,7 +172,7 @@ async function incomingData(event) {
             xValues.push(x);
           }
     }
-
+    log(event.target.value.byteLength);
     for (var i = 0; i < event.target.value.byteLength; i++) {
         val = event.target.value.getUint8(i);
 
