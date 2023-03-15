@@ -326,7 +326,7 @@ async function ble_connect() {
             console.log("Delayed for 1 seconds.");
           }, "1000");
         // Subscribe to notifications
-        await notificationChar.startNotifications();
+        await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
 
