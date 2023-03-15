@@ -322,8 +322,8 @@ async function ble_connect() {
 
         txChar.writeValue(startArr);
         setTimeout(() => {
-            console.log("Delayed for 0.5 second.");
-          }, "500");
+            console.log("Delayed for 2 second.");
+          }, "2000");
         // Subscribe to notifications
         await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
