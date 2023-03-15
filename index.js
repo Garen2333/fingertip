@@ -7,6 +7,7 @@ var packet_count = 0;
 var BPP_SVC_UUID = "0000fe40-cc7a-482a-984a-7f2ed5b3e58f";
 var RX_CHAR_UUID   = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
+var IDLE_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19"
 
 var no_data_yet = true;
 
@@ -325,7 +326,7 @@ async function ble_connect() {
           }, "1000");
         const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
         // Subscribe to notifications
-        await flowcontrolChar.startNotifications();
+        //await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
 
