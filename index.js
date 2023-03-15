@@ -175,7 +175,8 @@ async function incomingData(event) {
     for (var i = 0; i < event.target.value.byteLength; i++) {
         val = event.target.value.getUint8(i);
         receivedData[i] = val;
-        log(val);
+        console.log(val);
+        console.log(event.target.value.byteLength);
         /*switch (state) {
             case 0:
                 if (val == 0xf0) {
