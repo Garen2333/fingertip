@@ -5,7 +5,7 @@ var packet_count = 0;
 
 // Define the CodeLess UUIDs 
 var BPP_SVC_UUID = "0000fe40-cc7a-482a-984a-7f2ed5b3e58f";
-var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
+var RX_CHAR_UUID   = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 
 var no_data_yet = true;
@@ -314,7 +314,6 @@ async function ble_connect() {
         // Connect to device GATT and perform attribute discovery
         server = await device.gatt.connect();
         const service = await server.getPrimaryService(BPP_SVC_UUID);
-        const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
         const txChar = await service.getCharacteristic(TX_CHAR_UUID);
 
         createSettings();
@@ -322,8 +321,9 @@ async function ble_connect() {
 
         txChar.writeValue(startArr);
         setTimeout(() => {
-            console.log("Delayed for 10 seconds.");
-          }, "10000");
+            console.log("Delayed for 1 seconds.");
+          }, "1000");
+        const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
         // Subscribe to notifications
         await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
