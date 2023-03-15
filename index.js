@@ -5,8 +5,8 @@ var packet_count = 0;
 
 // Define the CodeLess UUIDs 
 var BPP_SVC_UUID = "0000fe40-cc7a-482a-984a-7f2ed5b3e58f";
-var RX_CHAR_UUID   = "0000fe41-8e22-4541-9d4c-21edae82ed19";
-var TX_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19";
+var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
+var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 
 var no_data_yet = true;
 
@@ -175,7 +175,6 @@ async function incomingData(event) {
     for (var i = 0; i < event.target.value.byteLength; i++) {
         val = event.target.value.getUint8(i);
         receivedData[i] = val;
-        console.log(val);
         console.log(event.target.value.byteLength);
         /*switch (state) {
             case 0:
