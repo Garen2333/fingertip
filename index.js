@@ -7,7 +7,7 @@ var packet_count = 0;
 var BPP_SVC_UUID = "0000fe40-cc7a-482a-984a-7f2ed5b3e58f";
 var RX_CHAR_UUID   = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
-var IDLE_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19"
+var NOTIFY_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19"
 
 var no_data_yet = true;
 
@@ -316,7 +316,8 @@ async function ble_connect() {
         server = await device.gatt.connect();
         const service = await server.getPrimaryService(BPP_SVC_UUID);
         const txChar = await service.getCharacteristic(TX_CHAR_UUID);
-
+        const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
+        const notificationChar = await service.getCharacteristic(NOTIFY_CHAR_UUID);
         createSettings();
         createStart();
 
@@ -324,9 +325,8 @@ async function ble_connect() {
         setTimeout(() => {
             console.log("Delayed for 1 seconds.");
           }, "1000");
-        const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
         // Subscribe to notifications
-        //await flowcontrolChar.startNotifications();
+        await notificationChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
 
