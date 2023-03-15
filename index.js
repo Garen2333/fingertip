@@ -318,7 +318,7 @@ async function ble_connect() {
         const txChar = await service.getCharacteristic(TX_CHAR_UUID);
         const flowcontrolChar = await service.getCharacteristic(NOTIFY_CHAR_UUID);
         const notificationChar = await service.getCharacteristic(NOTIFY_CHAR_UUID);
-        createSettings();(
+        createSettings();
         createStart();
 
         txChar.writeValue(startArr);
