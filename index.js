@@ -173,7 +173,7 @@ async function incomingData(event) {
             xValues.push(x);
           }
     }
-    for (var i = 0; i < event.target.value.byteLength - 2; i++) {
+    for (var i = 0; i < event.target.value.byteLength; i++) {
         val = event.target.value.getUint8(i);
         receivedData[i] = val;
         /*switch (state) {
@@ -210,7 +210,6 @@ async function incomingData(event) {
                 break;
         }*/
     }
-    console.log(receivedData);
     parseRaw(receivedData);
 }
 
