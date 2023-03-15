@@ -316,7 +316,7 @@ async function ble_connect() {
         server = await device.gatt.connect();
         const service = await server.getPrimaryService(BPP_SVC_UUID);
         const txChar = await service.getCharacteristic(TX_CHAR_UUID);
-        const flowcontrolChar = await service.getCharacteristic(NOTIFY_CHAR_UUID);
+        const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
         const notificationChar = await service.getCharacteristic(NOTIFY_CHAR_UUID);
         createSettings();
         createStart();
@@ -326,7 +326,7 @@ async function ble_connect() {
             console.log("Delayed for 1 seconds.");
           }, "1000");
         // Subscribe to notifications
-        await flowcontrolChar.startNotifications();
+        await notificationChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
 
