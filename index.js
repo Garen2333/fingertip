@@ -8,7 +8,7 @@ var packet_count = 0;
 /* // nbr uuid
 var BPP_SVC_UUID = "00000000-0001-11e1-9ab4-0002a5d5c51b"; */
 // p2p uuid 
-var BPP_SVC_UUID = "0000fe40-8e22-4541-9d4c-21edae82ed19";
+var BPP_SVC_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 // var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
 // var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 /* var RX_CHAR_UUID   = "00e00000-0001-11e1-ac36-0002a5d5c51b";
