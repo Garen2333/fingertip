@@ -307,7 +307,7 @@ async function ble_connect() {
         /*TODO: change the name of device and UUID*/
         device = await navigator.bluetooth.requestDevice({
             filters: [{ name: 'WB5M DK' }],
-            acceptAllDevices : true,
+            // acceptAllDevices : true,
             optionalServices: [BPP_SVC_UUID]
         });
         device.addEventListener('gattserverdisconnected', onDisconnected);
