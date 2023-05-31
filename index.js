@@ -306,7 +306,7 @@ async function ble_connect() {
         log('Requesting Bluetooth Device...');
         /*TODO: change the name of device and UUID*/
         device = await navigator.bluetooth.requestDevice({
-            //filters: [{ name: 'WB5M DK' }],
+            filters: [{ name: 'WB5M DK' }],
             acceptAllDevices : true,
             optionalServices: [BPP_SVC_UUID]
         });
