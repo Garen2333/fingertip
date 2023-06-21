@@ -8,14 +8,18 @@ var packet_count = 0;
 /* // nbr uuid
 var BPP_SVC_UUID = "00000000-0001-11e1-9ab4-0002a5d5c51b"; */
 // p2p uuid 
-var BPP_SVC_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
+//var BPP_SVC_UUID = "FD8E15A8-66EA-5115-CCBA-0E0818C4EA4F";
+var UART_SVC_UUID = "6e400001-b5a3-f393-e0a9-e50r24dcca9e";
+
 // var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
 // var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 /* var RX_CHAR_UUID   = "00e00000-0001-11e1-ac36-0002a5d5c51b";
 var TX_CHAR_UUID = "00e00000-0001-11e1-ac36-0002a5d5c51b"; */
 // p2p service id
-var RX_CHAR_UUID   = "0000fe41-cc7a-482a-984a-7f2ed5b3e58f";
-var TX_CHAR_UUID = "0000fe42-cc7a-482a-984a-7f2ed5b3e58f";
+// write characteristic
+var RX_CHAR_UUID   = "6e400002-b5a3-f393-e0a9-e50r24dcca9eE";
+// notify characteristic
+var TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50r24dcca9e"; 
 
 var no_data_yet = true;
 
@@ -81,7 +85,7 @@ var ecg_chart = new SmoothieChart(
     }
 );
 
-var test_chart = new Chart("bpchart", {
+/* var test_chart = new Chart("bpchart", {
     type: "line",
     data: {
         labels: xValues,
@@ -104,7 +108,7 @@ var test_chart = new Chart("bpchart", {
         //     fontSize: 16
         // }
     }
-});
+}); */
 
 var algXvalues = ["SBP", "DBP"];
 var algYvalues = [0, 0];
@@ -158,7 +162,7 @@ function normalize(arr_in) {
   }
 
 // Incoming GATT notification was received
-async function incomingData(event) {
+/* async function incomingData(event) {
 
     if (no_data_yet) {
 
@@ -185,66 +189,41 @@ async function incomingData(event) {
         val = event.target.value.getUint8(i);
         receivedData[i] = val;
         console.log(event.target.value.byteLength);
-        /*switch (state) {
-            case 0:
-                if (val == 0xf0) {
-                    state = 1;
-                }
-                break;
-
-            case 1:
-                if (val == 0x0f) {
-                    receivedData.length = 0;
-                    receivedDataIndex = 0;
-                    state = 2;
-                }
-                else {
-                    state = 0;
-                }
-                break;
-
-            case 2:
-                receivedData[receivedDataIndex++] = val;
-
-                if (receivedData.length == 6) {
-                    state = 0;
-
-                    if (alg_mode == 1){
-                        parseRaw(receivedData);
-                    }
-                    else{
-                        parseProcessed(receivedData);
-                    }
-                }
-                break;
-        }*/
+        log(val);
+    
     }
+    console.log("receivedData: ", receivedData);
     parseRaw(receivedData);
-}
+} */
 
-function parseRaw(data) {
-    ppg = 0;
-    ecg = 0;
+function incomingData(event) {
+    document.getElementById('chart-area').style = "display:inline;";
+    // Get the raw data
+    
+    let rawData = event.target.value;
 
-    ppg = data[0] << 16;
-    ppg |= data[1] << 8;
-    ppg |= data[2];
+    // Convert the data to a string
+    let strData = new TextDecoder().decode(rawData);
 
-    ecg = data[3] << 16;
-    ecg |= data[4] << 8;
-    ecg |= data[5];
+    // Split the string into lines
+    let lines = strData.split('\n');
 
-    if (data[3] > 128) {
-        ecg -= Math.pow(2, 24);
+    // Process each line
+    for(let line of lines){
+        // Parse the ADC value from the line, if present
+        if(line.includes('ADC event number')) {
+            let value = parseInt(line.split(':')[1].trim());
+            if(!isNaN(value)) {
+                parseRaw(value);
+            }
+        }
     }
+}
+function parseRaw(data) {
 
-    //TODO Calculate checksum
 
-    document.getElementById("log").value = "";
-    log('ECG: ' + ecg + ', PPG: ' + ppg);
-    dataLog = dataLog + ppg + ', ' + ecg + '\n';
 
-    graphRaw(ppg, ecg);
+    graphRaw(data, 0);
 }
 
 function parseProcessed(data) {
@@ -296,6 +275,7 @@ async function onDisconnected() {
 async function bleDisconnect() {
 
     createSettings();
+    document.getElementById('chart-area').style = "display:none;";
 
     if (device != null) {
         if (device.gatt.connected) {
@@ -314,21 +294,30 @@ async function ble_connect() {
         // Define a scan filter and prepare for interaction with Codeless Service
         log('Requesting Bluetooth Device...');
         /*TODO: change the name of device and UUID*/
+        //BPP_SVC_UUID = prompt("Please enter the Service UUID", "00000000-0000-0000-0000-000000000000"); // User input for the service UUID
+        let serviceUuid =   '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
         device = await navigator.bluetooth.requestDevice({
-            filters: [{ name: 'WB5M DK' }],
-            // acceptAllDevices : true,
-            optionalServices: [BPP_SVC_UUID]
+            //acceptAllDevices : true,
+            //filters: [{ name: 'WB5M DK' }],
+            filters: [{ namePrefix: 'Nordic' }],
+            optionalServices: [serviceUuid]
         });
+        //var RX_CHAR_UUID = prompt("Please enter the RX Characteristic UUID", "00000000-0000-0000-0000-000000000000"); // User input for the RX characteristic UUID
+        //let TX_CHAR_UUID = prompt("Please enter the TX Characteristic UUID", "00000000-0000-0000-0000-000000000000"); // User input for the TX characteristic UUID
+
         device.addEventListener('gattserverdisconnected', onDisconnected);
         // Connect to device GATT and perform attribute discovery
         server = await device.gatt.connect();
-        const service = await server.getPrimaryService(BPP_SVC_UUID);
-        const flowcontrolChar = await service.getCharacteristic(RX_CHAR_UUID);
-        const txChar = await service.getCharacteristic(TX_CHAR_UUID);
+        
+        const service = await server.getPrimaryService(serviceUuid);
+        let characteristicUuid_1 = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+        const txChar = await service.getCharacteristic(characteristicUuid_1);
+        let characteristicUuid_2 = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+        const flowcontrolChar = await service.getCharacteristic(characteristicUuid_2);
 
         createSettings();
         createStart();
-
+        log(startArr);
         txChar.writeValue(startArr);
         setTimeout(() => {
             console.log("Delayed for 10 seconds.");
@@ -337,6 +326,7 @@ async function ble_connect() {
         await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
+        createTimeline();
 
         if (alg_mode == 0) {
             document.getElementById('spinner').style = "display:flex;";
@@ -350,6 +340,34 @@ async function ble_connect() {
         log('Failed: ' + error);
     }
 }
+
+
+
+
+async function sendInput() {
+    try {
+        // Get the input value from the text field
+        let inputValue = document.getElementById('input').value;
+
+        // Convert the input string into bytes
+        let encoder = new TextEncoder('utf-8');
+        let data = encoder.encode(inputValue);
+
+        // Get the TX Characteristic from the connected BLE device
+        let serviceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        let characteristicUuid = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // This is the Tx characteristic UUID
+        const service = await server.getPrimaryService(serviceUuid);
+        const txChar = await service.getCharacteristic(characteristicUuid);
+
+        // Write the data to the Tx Characteristic
+        await txChar.writeValue(data);
+        console.log('Data sent: ', inputValue);
+    }
+    catch(error) {
+        console.error('Failed to send input: ', error);
+    }
+}
+
 
 function createTimeline() {
     document.getElementById('rawchart').width = document.getElementById('stage').clientWidth * 0.95;
