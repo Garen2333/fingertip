@@ -23,8 +23,24 @@ var TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50r24dcca9e";
 
 var no_data_yet = true;
 
-var ecg_ts = new TimeSeries();
-var ppg_ts = new TimeSeries();
+
+
+function TimeSeriesWithMemory() {
+    this.ts = new TimeSeries();
+    this.lastValue = 0;
+}
+
+TimeSeriesWithMemory.prototype.append = function(time, value) {
+    if (value !== 0) {
+        this.lastValue = value;
+    }
+    this.ts.append(time, this.lastValue);
+};
+
+var glucose_ts = new TimeSeriesWithMemory();
+var lactate_ts = new TimeSeriesWithMemory();
+var vitamin_ts = new TimeSeriesWithMemory();
+var ldopa_ts = new TimeSeriesWithMemory();
 
 var state = 0;
 var receivedData = [];
@@ -60,28 +76,62 @@ var test_chart_len = 500;
 
 var alg_mode = 1;
 
-var raw_chart = new SmoothieChart(
+var glucose_chart = new SmoothieChart(
     {
         millisPerPixel: 10,
-        //timestampFormatter: SmoothieChart.timeFormatter,
-        //interpolation: 'bezier',
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'bezier',
+        tooltip: true,
+        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
+    }
+);
+
+var lactate_chart = new SmoothieChart(
+    {
+        millisPerPixel: 10,
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'linear',
         tooltip: true,
         labels: { fontSize: 15, fillStyle: '#FFFFFF', precision: 0 },
-        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' },
+        //maxValue:30000,minValue:-30000
 
     }
 );
 
-var ecg_chart = new SmoothieChart(
+var vitamin_chart = new SmoothieChart(
     {
         millisPerPixel: 10,
-        //timestampFormatter: SmoothieChart.timeFormatter,
-        //interpolation: 'linear',
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFFFFF', precision: 0 },
-        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' },
-        //maxValue:30000,minValue:-30000
+        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
+    }
+);
 
+
+var ldopa_chart = new SmoothieChart(
+    {
+        millisPerPixel: 10,
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'bezier',
+        tooltip: true,
+        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
     }
 );
 
@@ -169,8 +219,8 @@ function normalize(arr_in) {
         if (alg_mode == 1){
             document.getElementById('algchart').style.display = "none";
             document.getElementById('chart-area').style = "display:inline;";
-            raw_chart.start();
-            ecg_chart.start();
+            glucose_chart.start();
+            lactate_chart.start();
         }
         else{
             //document.getElementById('alg-chart-area').style = "display:inline;";
@@ -196,10 +246,15 @@ function normalize(arr_in) {
     parseRaw(receivedData);
 } */
 
+let stats = {
+    CH0: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
+    CH1: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
+    CH2: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
+    CH3: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
+};
+
 function incomingData(event) {
-    document.getElementById('chart-area').style = "display:inline;";
     // Get the raw data
-    
     let rawData = event.target.value;
 
     // Convert the data to a string
@@ -208,22 +263,61 @@ function incomingData(event) {
     // Split the string into lines
     let lines = strData.split('\n');
 
-    // Process each line
     for(let line of lines){
-        // Parse the ADC value from the line, if present
-        if(line.includes('ADC event number')) {
-            let value = parseInt(line.split(':')[1].trim());
-            if(!isNaN(value)) {
-                parseRaw(value);
-            }
+        // Parse the channel and value from the line
+        let parts = line.split(':');
+        if(parts.length < 2) continue; // Skip lines that don't contain ':'
+
+        let channel = parts[0].trim();
+        let value = parseFloat(parts[1].trim());
+        if(isNaN(value)) continue; // Skip lines where the value is not a number
+
+        // Update stats for this channel
+        let channelStats = stats[channel];
+        channelStats.sum += value;
+        channelStats.count += 1;
+        channelStats.max = Math.max(channelStats.max, value);
+        channelStats.min = Math.min(channelStats.min, value);
+
+        // Process the value based on the channel
+        switch(channel) {
+            case 'CH0':
+                // Add the value to the rawData array
+                console.log("CH0: ", value);
+                document.getElementById('glucoseMax').innerHTML = stats.CH0.max;
+                document.getElementById('glucoseMean').innerHTML = (stats.CH0.sum / stats.CH0.count).toFixed(2);;
+                document.getElementById('glucoseMin').innerHTML = stats.CH0.min;
+                graphRaw(value, 0,0,0);
+                break;
+
+            case 'CH1':
+                // Add the value to the ecgData array
+                console.log("CH1: ", value);
+                document.getElementById('lactateMax').innerHTML = stats.CH1.max;
+                document.getElementById('lactateMean').innerHTML = (stats.CH1.sum / stats.CH1.count).toFixed(2);;
+                document.getElementById('lactateMin').innerHTML = stats.CH1.min;
+                graphRaw(0,value,0,0);
+                break;
+
+            case 'CH2':
+                // Add the value to the ecgData array
+                console.log("CH2: ", value);
+                document.getElementById('vitamincMax').innerHTML = stats.CH2.max;
+                document.getElementById('vitamincMean').innerHTML = (stats.CH2.sum / stats.CH2.count).toFixed(2);;
+                document.getElementById('vitamincMin').innerHTML = stats.CH2.min;
+                graphRaw(0,0,value, 0);
+                break;
+            
+            case 'CH3':
+                // Add the value to the ecgData array
+                console.log("CH3: ", value);
+                document.getElementById('ldopaMax').innerHTML = stats.CH3.max;
+                document.getElementById('ldopaMean').innerHTML = (stats.CH3.sum / stats.CH3.count).toFixed(2);;
+                document.getElementById('ldopaMin').innerHTML = stats.CH3.min;
+                graphRaw(0,0,0,value);
+                break;
         }
     }
-}
-function parseRaw(data) {
-
-
-
-    graphRaw(data, 0);
 }
 
 function parseProcessed(data) {
@@ -253,11 +347,14 @@ function parseProcessed(data) {
     graphProcessed(sbp, dbp);
 }
 
-function graphRaw(ppg, ecg) {
-    var time = new Date();
 
-    ppg_ts.append(time, ppg);
-    ecg_ts.append(time, ecg);
+function graphRaw(glucose, lactate, vitamin, ldopa) {
+    var time = new Date();
+    
+    glucose_ts.append(time,glucose);
+    lactate_ts.append(time,lactate);
+    vitamin_ts.append(time,vitamin);
+    ldopa_ts.append(time,ldopa);
 }
 
 function graphProcessed(sbp, dbp) {
@@ -274,8 +371,7 @@ async function onDisconnected() {
 
 async function bleDisconnect() {
 
-    createSettings();
-    document.getElementById('chart-area').style = "display:none;";
+    
 
     if (device != null) {
         if (device.gatt.connected) {
@@ -314,27 +410,19 @@ async function ble_connect() {
         const txChar = await service.getCharacteristic(characteristicUuid_1);
         let characteristicUuid_2 = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
         const flowcontrolChar = await service.getCharacteristic(characteristicUuid_2);
-
-        createSettings();
-        createStart();
-        log(startArr);
-        txChar.writeValue(startArr);
+        
+        
         setTimeout(() => {
             console.log("Delayed for 10 seconds.");
           }, "10000");
         // Subscribe to notifications
+        log("connected");
         await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
         createTimeline();
-
-        if (alg_mode == 0) {
-            document.getElementById('spinner').style = "display:flex;";
-            log('Calculating Blood Pressure...\n');
-        }
-        else {
-            log('Acquiring Raw Data...\n');
-        }
+        //document.getElementById('chart-area').style = "display:inline;";
+        
     }
     catch (error) {
         log('Failed: ' + error);
@@ -370,24 +458,36 @@ async function sendInput() {
 
 
 function createTimeline() {
-    document.getElementById('rawchart').width = document.getElementById('stage').clientWidth * 0.95;
-    document.getElementById('ecgchart').width = document.getElementById('stage').clientWidth * 0.95;
-    document.getElementById('algchart').width = document.getElementById('stage').clientWidth * 0.95;
+    document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
     //document.getElementById('bpchart').width = document.getElementById('stage').clientWidth * 0.95;
 
-    raw_chart.addTimeSeries(ppg_ts, {
-        strokeStyle: 'rgba(128, 0, 128, 1)',
-        lineWidth: 2
+    glucose_chart.addTimeSeries(glucose_ts.ts, {
+        strokeStyle:'rgb(255, 0, 255)', fillStyle:'rgba(255, 0, 255, 0.3)', lineWidth:3
 
     });
 
-    ecg_chart.addTimeSeries(ecg_ts, {
+    lactate_chart.addTimeSeries(lactate_ts.ts, {
         strokeStyle: 'rgba(255, 0, 0, 1)',
         lineWidth: 1
     });
 
-    raw_chart.streamTo(document.getElementById("rawchart"));
-    ecg_chart.streamTo(document.getElementById("ecgchart"));
+    vitamin_chart.addTimeSeries(vitamin_ts.ts, {
+        strokeStyle: 'rgba(255, 0, 0, 1)',
+        lineWidth: 1
+    });
+
+    ldopa_chart.addTimeSeries(ldopa_ts.ts, {
+        strokeStyle: 'rgba(255, 0, 0, 1)',
+        lineWidth: 1
+    });
+
+    glucose_chart.streamTo(document.getElementById("glucosechart"));
+    lactate_chart.streamTo(document.getElementById("lactatechart"));
+    vitamin_chart.streamTo(document.getElementById("vitaminchart"));
+    ldopa_chart.streamTo(document.getElementById("ldopachart"));
 }
 
 function calcChecksum()
@@ -434,9 +534,10 @@ function createStart(){
 }
 
 function adjust_width() {
-    document.getElementById('rawchart').width = document.getElementById('stage').clientWidth * 0.95;
-    document.getElementById('ecgchart').width = document.getElementById('stage').clientWidth * 0.95;
-    document.getElementById('algchart').width = document.getElementById('stage').clientWidth * 0.95;
+    document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
 }
 
 function interpolate(val_ppg, val_ecg) {
@@ -460,7 +561,7 @@ function interpolate(val_ppg, val_ecg) {
             val_data_interpolate_ppg = coef_a_ppg * x + coef_b_ppg;
             val_data_interpolate_ecg = coef_a_ecg * x + coef_b_ecg;
 
-            graphRaw(val_data_interpolate_ppg, val_data_interpolate_ecg);
+            graphRaw(val_data_interpolate_ppg, val_data_interpolate_ecg,0,0);
         }
 
         val_line_same_start = g_num_line;
@@ -726,3 +827,25 @@ function formatDate(date, format, utc) {
 
     return format;
 };
+
+function openTab(evt, chartName) {
+	// Declare all variables
+	var i, tabcontent, tablinks;
+
+	// Get all elements with class="tabcontent" and hide them
+	tabcontent = document.getElementsByClassName("tabcontent");
+	for (i = 0; i < tabcontent.length; i++) {
+		tabcontent[i].style.display = "none";
+	}
+
+	// Get all elements with class="tablinks" and remove the class "active"
+	tablinks = document.getElementsByClassName("tablinks");
+	for (i = 0; i < tablinks.length; i++) {
+		tablinks[i].className = tablinks[i].className.replace(" active", "");
+	}
+
+	// Show the current tab, and add an "active" class to the button that opened the tab
+	document.getElementById(chartName).style.display = "grid";
+	
+	evt.currentTarget.className += " active";
+	}
