@@ -4,7 +4,7 @@
 <head>
 
 	<meta charset="UTF-8">
-	<title>BP Patch v0.0.5</title>
+	<title>Ketone v0.0.1</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="main.css">
 	<script type="text/javascript" src="./smoothie.js"></script>
@@ -26,41 +26,7 @@
 	<br />
 	<div id="settings">
 
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="mode" style="font-size: 30px;">Mode</label>
-			<img src="icon/mode.png" style="height: 30px; margin-left: 10px;">
-			<select name="mode" id="mode">
-				<option value="1">Raw</option>
-				<option value="0">Processed</option>
-			</select>
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="gender" style="font-size: 30px;">Gender</label>
-			<img src="icon/gender.png" style="height: 30px; margin-left: 10px;">
-			<select name="gender" id="gender">
-				<option value="1">Male</option>
-				<option value="0">Female</option>
-			</select>
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="height" style="font-size: 30px;">Height [cm]</label>
-			<img src="icon/height.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="height" name="height" style="width: 40px;" value="170">
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="weight" style="font-size: 30px;">Weight [kg;optional]</label>
-			<img src="icon/weight-scale.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="weight" name="weight" style="width: 40px;" value="75">
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="age" style="font-size: 30px;">Age [optional]</label>
-			<img src="icon/age.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="age" name="age" style="width: 40px;" value="51">
-		</div>
+		
 	
 		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
 			<label for="input" style="font-size: 30px;">Command</label>
@@ -100,49 +66,19 @@
 		<canvas id="ecgchart" width="1200" height="120"></canvas><br />
 	</div> -->
 	<div id="chart-area" class="tabcontent" style="">
-		<div style="background-color: #f8d7da; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="glucosechart"  style="font-size: 20px;"> Glucose </label>
-			<br />
-			<canvas id="glucosechart" ></canvas><br />
-		</div>
-		<div style="background-color: #cce5ff; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="lactatechart"  style="font-size: 20px;"> Lactate </label>
-			<br />
-			<canvas id="lactatechart"></canvas><br />
-		</div>
-		<div style="background-color: #d4edda; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="vitaminchart"  style="font-size: 20px;"> Vitamin C </label>
-			<br />
-			<canvas id="vitaminchart"></canvas><br />
-		</div>
+		
 		<div style="background-color: #fff3cd; border-radius: 50px; margin: 20px 20px">
 			<br />
-			<label for="ldopachart"  style="font-size: 20px;"> L-Dopa </label>
+			<label for="ldopachart"  style="font-size: 20px;"> Ketone </label>
 			<br />
 			<canvas id="ldopachart"></canvas><br />
 		</div>
 	</div>
 
-	<div id="numerical-data" class="tabcontent" style="display: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); height: 450px; align-items: center; justify-items: center;">
+	<div id="numerical-data" class="tabcontent" style="display: none; height: 450px; align-items: center; justify-items: center;">
 
-		<div class="jumbotron" style="background-color: #f8d7da; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Glucose</h1>
-			<p class="lead">Max: <span id="glucoseMax">0</span> | Mean: <span id="glucoseMean">0</span> | Min: <span id="glucoseMin">0</span></p>
-		</div>
-		<div class="jumbotron" style="background-color: #cce5ff; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Lactate</h1>
-			<p class="lead">Max: <span id="lactateMax">0</span> | Mean: <span id="lactateMean">0</span> | Min: <span id="lactateMin">0</span></p>
-		</div>
-		<div class="jumbotron" style="background-color: #d4edda; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Vitamin C</h1>
-			<p class="lead">Max: <span id="vitamincMax">0</span> | Mean: <span id="vitamincMean">0</span> | Min: <span id="vitamincMin">0</span></p>
-		</div>
 		<div class="jumbotron" style="background-color: #fff3cd; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">L-DOPA</h1>
-			<p class="lead">Max: <span id="ldopaMax">0</span> | Mean: <span id="ldopaMean">0</span> | Min: <span id="ldopaMin">0</span></p>
+			<h1 class="display-4">Ketone</h1>
 		</div>
 	
 	</div>
@@ -216,8 +152,7 @@
 	}
 	#chart-area {
 		display: grid; 
-		grid-template-columns: 1fr 1fr; 
-		grid-template-rows: 1fr 1fr; 
+		
 		text-align: center; 
 		height: 450px;
 	}
