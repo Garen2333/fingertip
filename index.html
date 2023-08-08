@@ -4,7 +4,7 @@
 <head>
 
 	<meta charset="UTF-8">
-	<title>BP Patch v0.0.5</title>
+	<title>FingerTip Mobile v0.01</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="main.css">
 	<script type="text/javascript" src="./smoothie.js"></script>
@@ -24,58 +24,17 @@
 	<br />
 	<br />
 	<br />
-	<div id="settings">
 
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="mode" style="font-size: 30px;">Mode</label>
-			<img src="icon/mode.png" style="height: 30px; margin-left: 10px;">
-			<select name="mode" id="mode">
-				<option value="1">Raw</option>
-				<option value="0">Processed</option>
-			</select>
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="gender" style="font-size: 30px;">Gender</label>
-			<img src="icon/gender.png" style="height: 30px; margin-left: 10px;">
-			<select name="gender" id="gender">
-				<option value="1">Male</option>
-				<option value="0">Female</option>
-			</select>
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="height" style="font-size: 30px;">Height [cm]</label>
-			<img src="icon/height.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="height" name="height" style="width: 40px;" value="170">
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="weight" style="font-size: 30px;">Weight [kg;optional]</label>
-			<img src="icon/weight-scale.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="weight" name="weight" style="width: 40px;" value="75">
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="age" style="font-size: 30px;">Age [optional]</label>
-			<img src="icon/age.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="age" name="age" style="width: 40px;" value="51">
-		</div>
-	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="input" style="font-size: 30px;">Command</label>
-			<img src="icon/terminal.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="input" name="input" style="width: 40px;" value="">
-			<button type="button" onclick="sendInput()">
-				Send
-			</button>
-		</div>
+	<div id="stage" >
+		<button class="button button1" type="button" onclick="ble_connect()">
+			Connect To Device
+		</button>
+		
+		<button class="button button2" type="button" onclick="bleDisconnect()">
+			Disconnect From Device
+		</button>
 	</div>
 	
-	
-	
-
-	<hr>
 	<div style="display: none;">
 		<label for="log" style="font-size: 20px;">Log</label><br>
 		<textarea id="log" rows="5" cols="50" style="width: 1000px;"></textarea>
@@ -83,8 +42,10 @@
 	
 	<br /><br /><br />
 	<div class="tab" >
-		<button class="tablinks" onclick="openTab(event, 'chart-area')">Real-Time Graph</button>
-		<button class="tablinks" onclick="openTab(event, 'numerical-data')">Numerical Data</button>
+		<button class="tablinks" onclick="openTab(event, 'glucose')">Glucose</button>
+		<button class="tablinks" onclick="openTab(event, 'lactate')">Lactate</button>
+		<button class="tablinks" onclick="openTab(event, 'vita-c')">Vita C</button>
+		<button class="tablinks" onclick="openTab(event, 'l-dopa')">L-Dopa</button>
 	</div>
 	<!-- <div id="chart-area" style="text-align: center;">
 		<br />Glucose<br />
@@ -99,52 +60,59 @@
 		<br />L-dopa<br />
 		<canvas id="ecgchart" width="1200" height="120"></canvas><br />
 	</div> -->
-	<div id="chart-area" class="tabcontent" style="">
-		<div style="background-color: #f8d7da; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="glucosechart"  style="font-size: 20px;"> Glucose </label>
-			<br />
-			<canvas id="glucosechart" ></canvas><br />
-		</div>
-		<div style="background-color: #cce5ff; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="lactatechart"  style="font-size: 20px;"> Lactate </label>
-			<br />
-			<canvas id="lactatechart"></canvas><br />
-		</div>
-		<div style="background-color: #d4edda; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="vitaminchart"  style="font-size: 20px;"> Vitamin C </label>
-			<br />
-			<canvas id="vitaminchart"></canvas><br />
-		</div>
-		<div style="background-color: #fff3cd; border-radius: 50px; margin: 20px 20px">
-			<br />
-			<label for="ldopachart"  style="font-size: 20px;"> L-Dopa </label>
-			<br />
-			<canvas id="ldopachart"></canvas><br />
-		</div>
-	</div>
+	
 
-	<div id="numerical-data" class="tabcontent" style="display: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); height: 450px; align-items: center; justify-items: center;">
+	
 
-		<div class="jumbotron" style="background-color: #f8d7da; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Glucose</h1>
+
+	<div id="glucose" class="tabcontent">
+		
+		<div style="background-color: #f8d7da; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+			<canvas id="glucosechart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		<div class="jumbotron" style="background-color: #f8d7da; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
 			<p class="lead">Max: <span id="glucoseMax">0</span> | Mean: <span id="glucoseMean">0</span> | Min: <span id="glucoseMin">0</span></p>
 		</div>
-		<div class="jumbotron" style="background-color: #cce5ff; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Lactate</h1>
+		
+	</div>
+
+	<div id="lactate" class="tabcontent">
+		
+		<div style="background-color: #cce5ff; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+			<canvas id="lactatechart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		<div class="jumbotron" style="background-color: #cce5ff; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
 			<p class="lead">Max: <span id="lactateMax">0</span> | Mean: <span id="lactateMean">0</span> | Min: <span id="lactateMin">0</span></p>
 		</div>
-		<div class="jumbotron" style="background-color: #d4edda; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Vitamin C</h1>
+		
+	</div>
+
+
+	<div id="vita-c" class="tabcontent">
+		
+		<div style="background-color: #d4edda; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+			<canvas id="vitaminchart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		<div class="jumbotron" style="background-color: #d4edda; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
+			
 			<p class="lead">Max: <span id="vitamincMax">0</span> | Mean: <span id="vitamincMean">0</span> | Min: <span id="vitamincMin">0</span></p>
 		</div>
-		<div class="jumbotron" style="background-color: #fff3cd; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">L-DOPA</h1>
+		
+	</div>
+
+	<div id="l-dopa" class="tabcontent">
+		
+		<div style="background-color: #fff3cd; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+			<canvas id="ldopachart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		<div class="jumbotron" style="background-color: #fff3cd; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
 			<p class="lead">Max: <span id="ldopaMax">0</span> | Mean: <span id="ldopaMean">0</span> | Min: <span id="ldopaMin">0</span></p>
 		</div>
-	
+		
 	</div>
 	
 	
@@ -158,17 +126,7 @@
 	<div id="spinner" class="loader center" style="display:none;"></div>
 	<!-- <canvas id="bpchart" width="1200" height="300"></canvas><br /> -->
 
-	<div id="stage" >
-		<button class="button button1" type="button" onclick="ble_connect()">
-			Connect To Device
-		</button>
-		
-		<button class="button button2" type="button" onclick="bleDisconnect()">
-			Disconnect From Device
-		</button>
-		
-		<input id="savebutton" class="button button3" type="button" onclick="save('bp_patch', dataLog);" value="Download Data">
-	</div>
+	
 
 	<style>
 		.circle-card {
@@ -194,17 +152,15 @@
 
 <style>
 	#stage {
-		background-color: rgb(48, 183, 232);
 		width: 90%;
 		border-radius: 50px;
 		display: flex;
-		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		height: 100px;
+		height: 10vh;
 		gap: 10px;
 		margin: auto;
-		margin-top: 5vh;
+
 
 	}
 

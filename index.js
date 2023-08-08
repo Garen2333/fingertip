@@ -458,10 +458,18 @@ async function sendInput() {
 
 
 function createTimeline() {
-    document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
+    document.getElementById('glucosechart').height = window.innerHeight * 0.25;
+    document.getElementById('glucosechart').width = window.innerWidth * 0.8;
+
+    document.getElementById('vitaminchart').height = window.innerHeight * 0.25;
+    document.getElementById('vitaminchart').width = window.innerWidth * 0.8;
+
+    document.getElementById('lactatechart').height = window.innerHeight * 0.25;
+    document.getElementById('lactatechart').width = window.innerWidth * 0.8;
+
+    document.getElementById('ldopachart').height = window.innerHeight * 0.25;
+    document.getElementById('ldopachart').width = window.innerWidth * 0.8;
+   
     //document.getElementById('bpchart').width = document.getElementById('stage').clientWidth * 0.95;
 
     glucose_chart.addTimeSeries(glucose_ts.ts, {
@@ -534,10 +542,10 @@ function createStart(){
 }
 
 function adjust_width() {
-    document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
+    //document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
+    //document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
+    //document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
+    //document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
 }
 
 function interpolate(val_ppg, val_ecg) {
