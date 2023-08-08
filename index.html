@@ -67,7 +67,7 @@
 
 	<div id="glucose" class="tabcontent">
 		
-		<div style="background-color: #f8d7da; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+		<div class="chart" style="background-color: #f8d7da;">
 			<canvas id="glucosechart" style="border-radius: 20px;"></canvas>
 		</div>
 		
@@ -79,7 +79,7 @@
 
 	<div id="lactate" class="tabcontent">
 		
-		<div style="background-color: #cce5ff; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+		<div class="chart" style="background-color: #cce5ff;">
 			<canvas id="lactatechart" style="border-radius: 20px;"></canvas>
 		</div>
 		
@@ -92,7 +92,7 @@
 
 	<div id="vita-c" class="tabcontent">
 		
-		<div style="background-color: #d4edda; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+		<div class="chart" style="background-color: #d4edda;">
 			<canvas id="vitaminchart" style="border-radius: 20px;"></canvas>
 		</div>
 		
@@ -105,7 +105,7 @@
 
 	<div id="l-dopa" class="tabcontent">
 		
-		<div style="background-color: #fff3cd; border-radius: 50px; width: 90vw; height: 30vh; display: flex; align-items: center; justify-content: center;">
+		<div class="chart" style="background-color: #fff3cd;">
 			<canvas id="ldopachart" style="border-radius: 20px;"></canvas>
 		</div>
 		
@@ -125,22 +125,6 @@
 
 	<div id="spinner" class="loader center" style="display:none;"></div>
 	<!-- <canvas id="bpchart" width="1200" height="300"></canvas><br /> -->
-
-	
-
-	<style>
-		.circle-card {
-			border-radius: 50%;
-			width: 200px;
-			height: 200px;
-			text-align: center;
-			padding: 60px 20px;
-			color: white;
-		}
-		.circle-card h5 {
-			margin-top: 15px;
-		}
-	</style>
 	
 
 	
@@ -149,7 +133,9 @@
 </body>
 
 </html>
-
+<script>
+	document.querySelector('.button.button1').addEventListener('touchend', ble_connect);
+</script>
 <style>
 	#stage {
 		width: 90%;
@@ -163,19 +149,14 @@
 
 
 	}
-
-	#settings{
-		display:flex;
+	.chart {
+		border-radius: 50px; 
+		width: 90vw; height: 30vh; 
+		display: flex; 
 		align-items: center; 
-		flex-wrap: wrap; 
 		justify-content: center;
+
 	}
-	#chart-area {
-		display: grid; 
-		grid-template-columns: 1fr 1fr; 
-		grid-template-rows: 1fr 1fr; 
-		text-align: center; 
-		height: 450px;
-	}
+
 
 </style>
