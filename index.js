@@ -9,7 +9,7 @@ var packet_count = 0;
 var BPP_SVC_UUID = "00000000-0001-11e1-9ab4-0002a5d5c51b"; */
 // p2p uuid 
 //var BPP_SVC_UUID = "FD8E15A8-66EA-5115-CCBA-0E0818C4EA4F";
-var UART_SVC_UUID = "6e400001-b5a3-f393-e0a9-e50r24dcca9e";
+var UART_SVC_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 
 // var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
 // var TX_CHAR_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
@@ -17,9 +17,9 @@ var UART_SVC_UUID = "6e400001-b5a3-f393-e0a9-e50r24dcca9e";
 var TX_CHAR_UUID = "00e00000-0001-11e1-ac36-0002a5d5c51b"; */
 // p2p service id
 // write characteristic
-var RX_CHAR_UUID   = "6e400002-b5a3-f393-e0a9-e50r24dcca9eE";
+var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
 // notify characteristic
-var TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50r24dcca9e"; 
+var TX_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19"; 
 
 var no_data_yet = true;
 
@@ -395,7 +395,7 @@ async function ble_connect() {
         device = await navigator.bluetooth.requestDevice({
             //acceptAllDevices : true,
             //filters: [{ name: 'WB5M DK' }],
-            filters: [{ namePrefix: 'Nordic' }],
+            filters: [{ namePrefix: 'WB5M' }],
             optionalServices: [serviceUuid]
         });
         //var RX_CHAR_UUID = prompt("Please enter the RX Characteristic UUID", "00000000-0000-0000-0000-000000000000"); // User input for the RX characteristic UUID
