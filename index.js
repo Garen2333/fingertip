@@ -364,7 +364,7 @@ function graphProcessed(sbp, dbp) {
     alg_chart.update();
 }
 
-/* async function onDisconnected() {
+async function onDisconnected() {
     log("Bluetooth connection terminated!");
     no_data_yet = true;
 }
@@ -382,10 +382,10 @@ async function bleDisconnect() {
             log('> Bluetooth Device is already disconnected');
         }
     }
-} */
+}
 
 
-// Function to disconnect from a BLE device
+/* // Function to disconnect from a BLE device
 async function bleDisconnect() {
     if (!device) {
         log('No Bluetooth Device connected...');
@@ -395,6 +395,7 @@ async function bleDisconnect() {
     if (device.gatt.connected) {
         device.gatt.disconnect();
         log('Disconnected from GATT Server');
+        
     } else {
         log('Bluetooth Device is already disconnected');
     }
@@ -404,7 +405,7 @@ async function bleDisconnect() {
 async function onDisconnected(event) {
     const device = event.target;
     log(`Device ${device.name} is disconnected.`);
-}
+} */
 
 // Scan, connect and explore CodeLess BLE device
 async function ble_connect() {
@@ -423,26 +424,30 @@ async function ble_connect() {
         //var RX_CHAR_UUID = prompt("Please enter the RX Characteristic UUID", "00000000-0000-0000-0000-000000000000"); // User input for the RX characteristic UUID
         //let TX_CHAR_UUID = prompt("Please enter the TX Characteristic UUID", "00000000-0000-0000-0000-000000000000"); // User input for the TX characteristic UUID
 
-        device.addEventListener('gattserverdisconnected', onDisconnected);
+        
         // Connect to device GATT and perform attribute discovery
         server = await device.gatt.connect();
-        
+        device.addEventListener('gattserverdisconnected', onDisconnected);
         const service = await server.getPrimaryService(serviceUuid);
         let characteristicUuid_1 = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
         const txChar = await service.getCharacteristic(characteristicUuid_1);
         let characteristicUuid_2 = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
         const flowcontrolChar = await service.getCharacteristic(characteristicUuid_2);
         
-        
-        setTimeout(() => {
-            bleDisconnect();
-            console.log("disconnect after 10 seconds.");
-          }, 10000);
+        if (flowcontrolChar) {  // Check if the characteristic is fetched successfully
+            // Subscribe to notifications
+            await flowcontrolChar.startNotifications();
+            flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
+            log("connected");
+            log('Ready to communicate!\n');
+            
+            setTimeout(() => {
+                bleDisconnect();
+                console.log("disconnect after 10 seconds.");
+            }, 10000);
+        }
         // Subscribe to notifications
-        log("connected");
-        await flowcontrolChar.startNotifications();
-        flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
-        log('Ready to communicate!\n');
+        
         createTimeline();
         //document.getElementById('chart-area').style = "display:inline;";
         
@@ -451,6 +456,46 @@ async function ble_connect() {
         log('Failed: ' + error);
     }
 }
+
+
+async function bleReconnect() {
+    if (!device) {
+        log('No Bluetooth Device to reconnect...');
+        return;
+    }
+
+    try {
+        if (device.gatt.connected) {
+            log('Device already connected');
+            return;
+        }
+        
+        log('Reconnecting to GATT Server...');
+        
+        server = await device.gatt.connect();
+        
+        const serviceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        const service = await server.getPrimaryService(serviceUuid);
+
+        let characteristicUuid_1 = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+        const txChar = await service.getCharacteristic(characteristicUuid_1);
+
+        let characteristicUuid_2 = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+        const flowcontrolChar = await service.getCharacteristic(characteristicUuid_2);
+        
+        log("Reconnected");
+
+        // Here, I assume you want to resubscribe to notifications
+        await flowcontrolChar.startNotifications();
+        flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
+        
+        log('Ready to communicate again!');
+
+    } catch (error) {
+        log('Reconnection failed: ' + error);
+    }
+}
+
 
 
 
