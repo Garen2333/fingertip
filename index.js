@@ -364,7 +364,7 @@ function graphProcessed(sbp, dbp) {
     alg_chart.update();
 }
 
-async function onDisconnected() {
+/* async function onDisconnected() {
     log("Bluetooth connection terminated!");
     no_data_yet = true;
 }
@@ -382,6 +382,28 @@ async function bleDisconnect() {
             log('> Bluetooth Device is already disconnected');
         }
     }
+} */
+
+
+// Function to disconnect from a BLE device
+async function bleDisconnect() {
+    if (!device) {
+        log('No Bluetooth Device connected...');
+        return;
+    }
+
+    if (device.gatt.connected) {
+        device.gatt.disconnect();
+        log('Disconnected from GATT Server');
+    } else {
+        log('Bluetooth Device is already disconnected');
+    }
+}
+
+// Event listener callback for when the device is disconnected
+async function onDisconnected(event) {
+    const device = event.target;
+    log(`Device ${device.name} is disconnected.`);
 }
 
 // Scan, connect and explore CodeLess BLE device
@@ -413,8 +435,9 @@ async function ble_connect() {
         
         
         setTimeout(() => {
-            console.log("Delayed for 10 seconds.");
-          }, "10000");
+            bleDisconnect();
+            console.log("disconnect after 10 seconds.");
+          }, 10000);
         // Subscribe to notifications
         log("connected");
         await flowcontrolChar.startNotifications();
