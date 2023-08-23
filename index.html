@@ -4,7 +4,7 @@
 <head>
 
 	<meta charset="UTF-8">
-	<title>FingerTip Mobile v0.01</title>
+	<title>FingerTip Mobile v0.02</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="main.css">
 	<script type="text/javascript" src="./smoothie.js"></script>
@@ -26,13 +26,13 @@
 	<br />
 
 	<div id="stage" >
-		<button class="button button1" type="button" onclick="ble_connect()">
-			Connect To Device
+		<button class="button button1" type="button" onclick="ble_connect()" style="width: 30%; text-align: center;">
+			Start
 		</button>
 		
-		<button class="button button2" type="button" onclick="bleDisconnect()">
+		<!-- <button class="button button2" type="button" onclick="bleDisconnect()">
 			Disconnect From Device
-		</button>
+		</button> -->
 	</div>
 	
 	<div style="display: none;">
@@ -41,6 +41,11 @@
 	</div>
 	
 	<br /><br /><br />
+
+	<div class="tab" >
+		<button class="tablinks" onclick="openTab(event, 'vita-c')">Numerical</button>
+		<button class="tablinks" onclick="openTab(event, 'l-dopa')">Graphic</button>
+	</div>
 	<div class="tab" >
 		<button class="tablinks" onclick="openTab(event, 'glucose')">Glucose</button>
 		<button class="tablinks" onclick="openTab(event, 'lactate')">Lactate</button>
@@ -150,7 +155,7 @@
 		width: 90%;
 		border-radius: 50px;
 		display: flex;
-		justify-content: center;
+		
 		align-items: center;
 		height: 10vh;
 		gap: 10px;
