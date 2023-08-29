@@ -20,7 +20,7 @@
 </head>
 
 
-<body onload="createTimeline();" onresize="adjust_width();" style="background-color: lightgrey;text-align: center">
+<body onload="createTimeline();" onresize="adjust_width();" style="background-color: #EDEFE3;text-align: center">
 	<br />
 	<br />
 	<br />
@@ -42,16 +42,14 @@
 	
 	<br /><br /><br />
 
+	<!-- Parameter Selection Buttons -->
+
+
 	<div class="tab" >
-		<button class="tablinks" onclick="openTab(event, 'vita-c')">Numerical</button>
-		<button class="tablinks" onclick="openTab(event, 'l-dopa')">Graphic</button>
+		<button class="tablinks" onclick="setActiveContentType('numerical')">Numerical</button>
+		<button class="tablinks" onclick="setActiveContentType('chart')">Graphic</button>
 	</div>
-	<div class="tab" >
-		<button class="tablinks" onclick="openTab(event, 'glucose')">Glucose</button>
-		<button class="tablinks" onclick="openTab(event, 'lactate')">Lactate</button>
-		<button class="tablinks" onclick="openTab(event, 'vita-c')">Vita C</button>
-		<button class="tablinks" onclick="openTab(event, 'l-dopa')">L-Dopa</button>
-	</div>
+	
 	<!-- <div id="chart-area" style="text-align: center;">
 		<br />Glucose<br />
 		<canvas id="rawchart" width="1200" height="120"></canvas><br />
@@ -71,31 +69,44 @@
 
 
 	<div id="glucose" class="tabcontent">
+
+		<div style="background-color: #f8d7da; border-radius: 20px; height: 30%;">
+			<div class="chart" style="padding-top:5%;" >
+				<canvas id="glucosechart" style="border-radius: 20px;"></canvas>
+			</div>
+	
+	
+			<div class="numerical">
+				<p class="lead">Max: <span id="glucoseMax">0</span></span></p>
+				<p class="lead">Mean: <span id="glucoseMean">0</span></p>
+				<p class="lead">Min: <span id="glucoseMin">0</span></p>
+			</div>
+
+
+		</div>
 		
-		<div class="chart" style="background-color: #f8d7da;">
-			<canvas id="glucosechart" style="border-radius: 20px;"></canvas>
-		</div>
-
-
-		<div class="jumbotron" style="background-color: #f8d7da; height: 20vh; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
-			<p class="lead">Max: <span id="glucoseMax">0</span></span></p>
-			<p class="lead">Mean: <span id="glucoseMean">0</span></p>
-			<p class="lead">Min: <span id="glucoseMin">0</span></p>
-		</div>
+		
 		
 	</div>
 
 	<div id="lactate" class="tabcontent">
 		
-		<div class="chart" style="background-color: #cce5ff;">
-			<canvas id="lactatechart" style="border-radius: 20px;"></canvas>
-		</div>
 		
-		
-		<div class="jumbotron" style="background-color: #cce5ff; height: 20vh; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
-			<p class="lead">Max: <span id="lactateMax">0</span></span></p>
-			<p class="lead">Mean: <span id="lactateMean">0</span></p>
-			<p class="lead">Min: <span id="lactateMin">0</span></p>
+
+
+		<div style="background-color: #cce5ff; border-radius: 20px; height: 30%;">
+			<div class="chart" style="padding-top:5%;" >
+				<canvas id="lactatechart" style="border-radius: 20px;"></canvas>
+			</div>
+			
+			
+			<div class="numerical" >
+				<p class="lead">Max: <span id="lactateMax">0</span></span></p>
+				<p class="lead">Mean: <span id="lactateMean">0</span></p>
+				<p class="lead">Min: <span id="lactateMin">0</span></p>
+			</div>
+
+
 		</div>
 		
 	</div>
@@ -103,37 +114,113 @@
 
 	<div id="vita-c" class="tabcontent">
 		
-		<div class="chart" style="background-color: #d4edda;">
-			<canvas id="vitaminchart" style="border-radius: 20px;"></canvas>
-		</div>
+		
 
-		<div class="jumbotron" style="background-color: #d4edda; height: 20vh; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
-			<p class="lead">Max: <span id="vitamincMax">0</span></span></p>
-			<p class="lead">Mean: <span id="vitamincMean">0</span></p>
-			<p class="lead">Min: <span id="vitamincMin">0</span></p>
+		<div style="background-color: #d4edda; border-radius: 20px; height: 30%;">
+			<div class="chart" style="padding-top:5%;">
+				<canvas id="vitaminchart" style="border-radius: 20px;"></canvas>
+			</div>
+	
+			<div class="numerical" >
+				<p class="lead">Max: <span id="vitamincMax">0</span></span></p>
+				<p class="lead">Mean: <span id="vitamincMean">0</span></p>
+				<p class="lead">Min: <span id="vitamincMin">0</span></p>
+			</div>
+
+
 		</div>
 		
 	</div>
 
 	<div id="l-dopa" class="tabcontent">
 		
-		<div class="chart" style="background-color: #fff3cd;">
-			<canvas id="ldopachart" style="border-radius: 20px;"></canvas>
+		
+
+		<div style="background-color: #fff3cd; border-radius: 20px; height: 30%;">
+			<div class="chart" style="padding-top:5%;">
+				<canvas id="ldopachart" style="border-radius: 20px;"></canvas>
+			</div>
+			
+			<div class="numerical">
+				<p class="lead">Max: <span id="ldopaMax">0</span></span></p>
+				<p class="lead">Mean: <span id="ldopaMean">0</span></p>
+				<p class="lead">Min: <span id="ldopaMin">0</span></p>
+			</div>
+
+
 		</div>
 		
-		<div class="jumbotron" style="background-color: #fff3cd; height: 20vh; width: 80vw; justify-content: center; align-items: center; margin: auto; margin-top: 5vh;">
-			<p class="lead">Max: <span id="ldopaMax">0</span></span></p>
-			<p class="lead">Mean: <span id="ldopaMean">0</span></p>
-			<p class="lead">Min: <span id="ldopaMin">0</span></p>
-		</div>
-		
+	</div>
+
+	<div class="tab" >
+		<button class="tablinks" onclick="setActiveParameter('glucose')">Glucose</button>
+		<button class="tablinks" onclick="setActiveParameter('lactate')">Lactate</button>
+		<button class="tablinks" onclick="setActiveParameter('vita-c')">Vita C</button>
+		<button class="tablinks" onclick="setActiveParameter('l-dopa')">L-Dopa</button>
 	</div>
 	
 	
 	
+	<h2 style="text-align: left; padding-left: 5%;">Past</h2>
 	
-	
-	
+	<div class="tab" >
+		<button class="tablinks" onclick="setActiveParameter('glucose')">30 Minutes</button>
+		<button class="tablinks" onclick="setActiveParameter('lactate')">1 hour</button>
+		<button class="tablinks" onclick="setActiveParameter('vita-c')">3 hours</button>
+		<button class="tablinks" onclick="setActiveParameter('l-dopa')">6 hours</button>
+	</div>
+
+
+	<div id="past-glucose" class="" style="display: flex; background-color: #f8d7da; border-radius: 20px; align-items: center;">
+
+		<img src="icon/glucose.png" style="width: 100px;">
+		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; width: 150px;">Glucose</label>
+		<div class="chart" style="padding-right: 5vw;">
+			<canvas id="pastglucosechart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		
+		
+	</div>
+
+	<div id="past-lactate" class="" style="display: flex; background-color: #cce5ff; border-radius: 20px; align-items: center;">
+
+		<img src="icon/lactate.gif" style="width: 100px; padding-left: 5vw;">
+		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500;width: 150px;">Lactate</label>
+		<div class="chart" style="padding-right: 5vw;">
+			<canvas id="pastlactatechart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		
+		
+	</div>
+
+
+	<div id="past-vita-c" class="" style="display: flex; background-color: #d4edda; border-radius: 20px; align-items: center; padding: 10px;">
+
+		<img src="icon/vitaminC.png" style="width: 100px; padding-left: 5vw;">
+		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; white-space: nowrap; width: 150px;">Vita-C</label>
+		<div class="chart" style="padding-right: 5vw;">
+			<canvas id="pastvitaminchart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		
+		
+	</div>
+
+	<div id="past-l-dopa" class="" style="display: flex; background-color: #fff3cd; border-radius: 20px; align-items: center; padding: 10px;">
+
+		<img src="icon/ldopa.png" style="width: 100px; padding-left: 5vw;">
+		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; white-space: nowrap; width: 150px;">L-Dopa</label>
+		<div class="chart" style="padding-right: 5vw;">
+			<canvas id="pastldopachart" style="border-radius: 20px;"></canvas>
+		</div>
+		
+		
+		
+	</div>
+
+
 	
 
 
@@ -157,16 +244,15 @@
 		display: flex;
 		
 		align-items: center;
-		height: 10vh;
+		
 		gap: 10px;
 		margin: auto;
 
 
 	}
 	.chart {
-		border-radius: 50px; 
-		width: 90vw; 
-		height: 30vh; 
+		
+		
 		display: flex; 
 		align-items: center; 
 		justify-content: center;

@@ -24,6 +24,38 @@ var TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50r24dcca9e";
 var no_data_yet = true;
 
 
+let activeParameter = null;
+let activeContentType = null;
+
+function setActiveParameter(parameter) {
+    activeParameter = parameter;
+    updateDisplay();
+}
+
+function setActiveContentType(type) {
+    activeContentType = type;
+    updateDisplay();
+}
+
+function updateDisplay() {
+    // First, hide all tab contents
+    const allContents = document.querySelectorAll('.tabcontent');
+    allContents.forEach(el => el.style.display = 'none');
+
+    if (activeParameter && activeContentType) {
+        // Display the active parameter's content
+        const activeTab = document.getElementById(activeParameter);
+        activeTab.style.display = 'block';
+
+        // Within that tab, hide all content types
+        const allTypes = activeTab.querySelectorAll('.chart, .numerical');
+        allTypes.forEach(el => el.style.display = 'none');
+
+        // Display the active content type
+        const activeType = activeTab.querySelector(`.${activeContentType}`);
+        activeType.style.display = 'block';
+    }
+}
 
 function TimeSeriesWithMemory() {
     this.ts = new TimeSeries();
@@ -91,7 +123,36 @@ var glucose_chart = new SmoothieChart(
     }
 );
 
+
+var past_glucose_chart = new SmoothieChart(
+    {
+        millisPerPixel: 10,
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'bezier',
+        tooltip: true,
+        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
+    }
+);
+
 var lactate_chart = new SmoothieChart(
+    {
+        millisPerPixel: 10,
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'linear',
+        tooltip: true,
+        labels: { fontSize: 15, fillStyle: '#FFFFFF', precision: 0 },
+        grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' },
+        //maxValue:30000,minValue:-30000
+
+    }
+);
+
+var past_lactate_chart = new SmoothieChart(
     {
         millisPerPixel: 10,
         timestampFormatter: SmoothieChart.timeFormatter,
@@ -119,8 +180,38 @@ var vitamin_chart = new SmoothieChart(
     }
 );
 
+var past_vitamin_chart = new SmoothieChart(
+    {
+        millisPerPixel: 10,
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'bezier',
+        tooltip: true,
+        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
+    }
+);
+
 
 var ldopa_chart = new SmoothieChart(
+    {
+        millisPerPixel: 10,
+        timestampFormatter: SmoothieChart.timeFormatter,
+        interpolation: 'bezier',
+        tooltip: true,
+        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
+    }
+);
+
+var past_ldopa_chart = new SmoothieChart(
     {
         millisPerPixel: 10,
         timestampFormatter: SmoothieChart.timeFormatter,
@@ -461,18 +552,39 @@ function createTimeline() {
     document.getElementById('glucosechart').height = window.innerHeight * 0.25;
     document.getElementById('glucosechart').width = window.innerWidth * 0.8;
 
+    document.getElementById('pastglucosechart').height = window.innerHeight * 0.10;
+    document.getElementById('pastglucosechart').width = window.innerWidth * 0.4;
+
     document.getElementById('vitaminchart').height = window.innerHeight * 0.25;
     document.getElementById('vitaminchart').width = window.innerWidth * 0.8;
+
+    document.getElementById('pastvitaminchart').height = window.innerHeight * 0.1;
+    document.getElementById('pastvitaminchart').width = window.innerWidth * 0.4;
 
     document.getElementById('lactatechart').height = window.innerHeight * 0.25;
     document.getElementById('lactatechart').width = window.innerWidth * 0.8;
 
+
+    document.getElementById('pastlactatechart').height = window.innerHeight * 0.1;
+    document.getElementById('pastlactatechart').width = window.innerWidth * 0.4;
+
+
     document.getElementById('ldopachart').height = window.innerHeight * 0.25;
     document.getElementById('ldopachart').width = window.innerWidth * 0.8;
+
+        
+    document.getElementById('pastldopachart').height = window.innerHeight * 0.1;
+    document.getElementById('pastldopachart').width = window.innerWidth * 0.4;
    
     //document.getElementById('bpchart').width = document.getElementById('stage').clientWidth * 0.95;
 
     glucose_chart.addTimeSeries(glucose_ts.ts, {
+        strokeStyle:'rgb(255, 0, 255)', fillStyle:'rgba(255, 0, 255, 0.3)', lineWidth:3
+
+    });
+
+
+    past_glucose_chart.addTimeSeries(glucose_ts.ts, {
         strokeStyle:'rgb(255, 0, 255)', fillStyle:'rgba(255, 0, 255, 0.3)', lineWidth:3
 
     });
@@ -482,7 +594,17 @@ function createTimeline() {
         lineWidth: 1
     });
 
+    past_lactate_chart.addTimeSeries(lactate_ts.ts, {
+        strokeStyle: 'rgba(255, 0, 0, 1)',
+        lineWidth: 1
+    });
+
     vitamin_chart.addTimeSeries(vitamin_ts.ts, {
+        strokeStyle: 'rgba(255, 0, 0, 1)',
+        lineWidth: 1
+    });
+
+    past_vitamin_chart.addTimeSeries(vitamin_ts.ts, {
         strokeStyle: 'rgba(255, 0, 0, 1)',
         lineWidth: 1
     });
@@ -492,10 +614,28 @@ function createTimeline() {
         lineWidth: 1
     });
 
+    past_ldopa_chart.addTimeSeries(ldopa_ts.ts, {
+        strokeStyle: 'rgba(255, 0, 0, 1)',
+        lineWidth: 1
+    });
+
     glucose_chart.streamTo(document.getElementById("glucosechart"));
+    past_glucose_chart.streamTo(document.getElementById("pastglucosechart"));
+
+
     lactate_chart.streamTo(document.getElementById("lactatechart"));
+    past_lactate_chart.streamTo(document.getElementById("pastlactatechart"));
+
+
     vitamin_chart.streamTo(document.getElementById("vitaminchart"));
+    past_vitamin_chart.streamTo(document.getElementById("pastvitaminchart"));
+
+
+
     ldopa_chart.streamTo(document.getElementById("ldopachart"));
+    past_ldopa_chart.streamTo(document.getElementById("pastldopachart"));
+
+
 }
 
 function calcChecksum()
@@ -835,25 +975,3 @@ function formatDate(date, format, utc) {
 
     return format;
 };
-
-function openTab(evt, chartName) {
-	// Declare all variables
-	var i, tabcontent, tablinks;
-
-	// Get all elements with class="tabcontent" and hide them
-	tabcontent = document.getElementsByClassName("tabcontent");
-	for (i = 0; i < tabcontent.length; i++) {
-		tabcontent[i].style.display = "none";
-	}
-
-	// Get all elements with class="tablinks" and remove the class "active"
-	tablinks = document.getElementsByClassName("tablinks");
-	for (i = 0; i < tablinks.length; i++) {
-		tablinks[i].className = tablinks[i].className.replace(" active", "");
-	}
-
-	// Show the current tab, and add an "active" class to the button that opened the tab
-	document.getElementById(chartName).style.display = "grid";
-	
-	evt.currentTarget.className += " active";
-	}
