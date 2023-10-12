@@ -104,7 +104,7 @@ var lactate_chart = new SmoothieChart(
     }
 );
 
-var vitamin_chart = new SmoothieChart(
+var concentration_chart = new SmoothieChart(
     {
         millisPerPixel: 10,
         timestampFormatter: SmoothieChart.timeFormatter,
@@ -391,7 +391,7 @@ async function ble_connect() {
         log('Requesting Bluetooth Device...');
         /*TODO: change the name of device and UUID*/
         //BPP_SVC_UUID = prompt("Please enter the Service UUID", "00000000-0000-0000-0000-000000000000"); // User input for the service UUID
-        let serviceUuid =   '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        let serviceUuid =   '0000fe40-cc7a-482a-984a-7f2ed5b3e58f';
         device = await navigator.bluetooth.requestDevice({
             //acceptAllDevices : true,
             //filters: [{ name: 'WB5M DK' }],
@@ -406,9 +406,9 @@ async function ble_connect() {
         server = await device.gatt.connect();
         
         const service = await server.getPrimaryService(serviceUuid);
-        let characteristicUuid_1 = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+        let characteristicUuid_1 = '0000fe42-8e22-4541-9d4c-21edae82ed19';
         const txChar = await service.getCharacteristic(characteristicUuid_1);
-        let characteristicUuid_2 = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+        let characteristicUuid_2 = '0000fe42-8e22-4541-9d4c-21edae82ed19';
         const flowcontrolChar = await service.getCharacteristic(characteristicUuid_2);
         
         
@@ -440,15 +440,15 @@ async function sendInput() {
         // Convert the input string into bytes
         let encoder = new TextEncoder('utf-8');
         let data = encoder.encode(inputValue);
-
+        createampStart();
         // Get the TX Characteristic from the connected BLE device
-        let serviceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-        let characteristicUuid = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // This is the Tx characteristic UUID
+        let serviceUuid = '0000fe40-cc7a-482a-984a-7f2ed5b3e58f';
+        let characteristicUuid = '0000fe41-8e22-4541-9d4c-21edae82ed19'; // This is the Tx characteristic UUID
         const service = await server.getPrimaryService(serviceUuid);
         const txChar = await service.getCharacteristic(characteristicUuid);
 
         // Write the data to the Tx Characteristic
-        await txChar.writeValue(data);
+        await txChar.writeValue(startArr);
         console.log('Data sent: ', inputValue);
     }
     catch(error) {
@@ -458,10 +458,9 @@ async function sendInput() {
 
 
 function createTimeline() {
-    document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
+
+    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.8;
+    document.getElementById('concentrationchart').width = document.getElementById('stage').clientWidth * 0.8;
     //document.getElementById('bpchart').width = document.getElementById('stage').clientWidth * 0.95;
 
     glucose_chart.addTimeSeries(glucose_ts.ts, {
@@ -474,7 +473,7 @@ function createTimeline() {
         lineWidth: 1
     });
 
-    vitamin_chart.addTimeSeries(vitamin_ts.ts, {
+    concentration_chart.addTimeSeries(vitamin_ts.ts, {
         strokeStyle: 'rgba(255, 0, 0, 1)',
         lineWidth: 1
     });
@@ -484,10 +483,9 @@ function createTimeline() {
         lineWidth: 1
     });
 
-    glucose_chart.streamTo(document.getElementById("glucosechart"));
-    lactate_chart.streamTo(document.getElementById("lactatechart"));
-    vitamin_chart.streamTo(document.getElementById("vitaminchart"));
+
     ldopa_chart.streamTo(document.getElementById("ldopachart"));
+    concentration_chart.streamTo(document.getElementById("concentrationchart"))
 }
 
 function calcChecksum()
@@ -533,11 +531,24 @@ function createStart(){
 
 }
 
+function createampStart(){
+    //"ampstart\r\n" 
+    startArr[0] = 'a'.charCodeAt(0);
+    startArr[1] = 'm'.charCodeAt(0);
+    startArr[2] = 'p'.charCodeAt(0);
+    startArr[3] = 's'.charCodeAt(0);
+    startArr[4] = 't'.charCodeAt(0);
+    startArr[5] = 'a'.charCodeAt(0);
+    startArr[6] = 'r'.charCodeAt(0);
+    startArr[7] = 't'.charCodeAt(0);
+    startArr[8] = '\r'.charCodeAt(0);
+    startArr[9] = '\n'.charCodeAt(0);
+
+}
+
 function adjust_width() {
-    document.getElementById('glucosechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('lactatechart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('vitaminchart').width = document.getElementById('stage').clientWidth * 0.4;
-    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.4;
+
+    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.8;
 }
 
 function interpolate(val_ppg, val_ecg) {

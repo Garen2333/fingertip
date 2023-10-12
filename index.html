@@ -29,34 +29,62 @@
 		
 	
 		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
-			<label for="input" style="font-size: 30px;">Command</label>
-			<img src="icon/terminal.png" style="height: 30px; margin-left: 10px;">
-			<input type="text" id="input" name="input" style="width: 40px;" value="">
-			<button type="button" onclick="sendInput()">
-				Send
-			</button>
-		</div>
-	</div>
-	
-	
-	
+			<div style="display: flex; align-items: center;">
+				<label for="input" style="font-size: 30px;">Command</label>
+				<img src="icon/terminal.png" style="height: 30px; margin-left: 10px;">
+				<input type="text" id="input" name="input" style="width: 80px;" value="">
+				<button type="button" onclick="sendInput()">
+					Send
+				</button>
+			</div>
 
-	<hr>
-	<div style="">
+			<!-- <div style="padding: 50px;">
+				<label for="concentration" style="font-size: 20px;">Command:</label>
+				
+				<input type="number" id="concentration" name="concentration" style="width: 70px;" value="">
+				<button type="button" onclick="sendInput()">
+					Send
+				</button>
+			</div>
+			<div style="padding: 50px;">
+				<label for="concentration" style="font-size: 20px;">K:</label>
+				<input type="number" id="concentration" name="concentration" style="width: 70px;" value="">
+				<button type="button" onclick="sendInput()">
+					input
+				</button>
+			</div> -->
+		
+		</div>
+
+
+	</div>
+
+	<div id="dashboard" style="margin: auto;">
+		
+		<svg id="ring" width="250px" height="250px">
+		  <circle cx="100" cy="105" r="90" fill="none" stroke-width="20" />
+		</svg>
+		<div id="ketoneLevel">0</div>
+		<div id="ketoneunit">mmol/L</div>
+		<div id="label">Ketone</div>
+	</div>
+
+
+	<div style="display: none;">
 		<label for="log" style="font-size: 20px;">Log</label><br>
-		<textarea id="log" rows="5" cols="50" style="width: 1000px;"></textarea>
+		<textarea id="log" rows="5" cols="50" style="width: 80%;"></textarea>
 	</div>
 	
-	<br /><br /><br />
+	<br />
 	<div class="tab" >
-		<button class="tablinks" onclick="openTab(event, 'chart-area')">Real-Time Graph</button>
-		<button class="tablinks" onclick="openTab(event, 'numerical-data')">Numerical Data</button>
+		<button class="tablinks" onclick="openTab(event, 'chart-area')" style="font-size: 23px; font-weight: 500;">Raw Data Graph</button>
+		<button class="tablinks" onclick="openTab(event, 'numerical-data')" style="font-size: 23px; font-weight: 500;">Concentration Graph</button>
 	</div>
 	<!-- <div id="chart-area" style="text-align: center;">
 		<br />Glucose<br />
 		<canvas id="rawchart" width="1200" height="120"></canvas><br />
 
-		<br />Lactate<br />
+		<br />Lact000ate<br />
 		<canvas id="ecgchart" width="1200" height="120"></canvas><br />
 
 		<br />Vitamin C<br />
@@ -69,16 +97,19 @@
 		
 		<div style="background-color: #fff3cd; border-radius: 50px; margin: 20px 20px">
 			<br />
-			<label for="ldopachart"  style="font-size: 20px;"> Ketone </label>
+			<label for="ldopachart"  style="font-size: 20px;"> Raw Data </label>
 			<br />
 			<canvas id="ldopachart"></canvas><br />
 		</div>
 	</div>
 
-	<div id="numerical-data" class="tabcontent" style="display: none; height: 450px; align-items: center; justify-items: center;">
+	<div id="numerical-data" class="tabcontent" style="">
 
-		<div class="jumbotron" style="background-color: #fff3cd; height: 180px; width: 700px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: auto;">
-			<h1 class="display-4">Ketone</h1>
+		<div style="background-color: #fff3cd; border-radius: 50px; margin: 20px 20px">
+			<br />
+			<label for="concentrationchart"  style="font-size: 20px;"> Concentration </label>
+			<br />
+			<canvas id="concentrationchart"></canvas><br />
 		</div>
 	
 	</div>
@@ -96,11 +127,11 @@
 
 	<div id="stage" >
 		<button class="button button1" type="button" onclick="ble_connect()">
-			Connect To Device
+			Connect
 		</button>
 		
 		<button class="button button2" type="button" onclick="bleDisconnect()">
-			Disconnect From Device
+			Disconnect
 		</button>
 		
 		<input id="savebutton" class="button button3" type="button" onclick="save('bp_patch', dataLog);" value="Download Data">
@@ -128,7 +159,78 @@
 
 </html>
 
+<script>
+	const ketoneLevel = 0.7; // Replace with actual value
+
+	// Get the SVG circle element
+	const circle = document.querySelector('#ring circle');
+
+	// Define ketone level ranges and corresponding colors
+	const levelRanges = [
+	{ max: 0.6, color: 'green' },
+	{ max: 1.5, color: 'yellow' },
+	{ max: 3.0, color: 'orange' },
+	{ max: Infinity, color: 'red' },
+	];
+
+	// Determine the color based on the ketone level
+	let color;
+	for (const range of levelRanges) {
+	if (ketoneLevel <= range.max) {
+		color = range.color;
+		break;
+	}
+	}
+
+	// Set the stroke color of the circle based on the ketone level
+	circle.setAttribute('stroke', color);
+
+	// Display the ketone level
+	document.getElementById('ketoneLevel').textContent = `${ketoneLevel}`;
+</script>
+
 <style>
+
+
+	#dashboard {
+	position: relative;
+	width: 200px;
+	height: 200px;
+	}
+
+	#ring {
+	position: absolute;
+	top: 0;
+	left: 0;
+	}
+
+	#ketoneLevel {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size:55px;
+	font-weight: bold;
+	}
+
+	#ketoneunit {
+	position: absolute;
+	top: 75%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 18px;
+	font-weight: bold;
+	}
+
+	#label {
+	position: absolute;
+	top: 15%;
+	left: 50%;
+	transform: translate(-50%, 20%);
+	font-size: 18px;
+	font-weight: bolder;
+	}
+
 	#stage {
 		background-color: rgb(48, 183, 232);
 		width: 90%;
@@ -140,7 +242,13 @@
 		height: 100px;
 		gap: 10px;
 		margin: auto;
-		margin-top: 5vh;
+		margin-top: 1vh;
+
+	}
+
+	#stage > button{
+		width: 25%;
+		text-align: center;
 
 	}
 
@@ -154,7 +262,14 @@
 		display: grid; 
 		
 		text-align: center; 
-		height: 450px;
+		height: 300px;
+	}
+
+	#numerical-data {
+		display: none; 
+		
+		text-align: center; 
+		height: 300px;
 	}
 
 </style>
