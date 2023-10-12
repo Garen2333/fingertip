@@ -24,25 +24,29 @@ var TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50r24dcca9e";
 var no_data_yet = true;
 
 
-let activeParameter = null;
+let activeParameter = glucose;
 let activeContentType = null;
 
 function setActiveParameter(parameter) {
     activeParameter = parameter;
+    log(activeParameter);
     updateDisplay();
 }
 
 function setActiveContentType(type) {
     activeContentType = type;
+    log(activeParameter);
     updateDisplay();
 }
 
 function updateDisplay() {
     // First, hide all tab contents
-    const allContents = document.querySelectorAll('.tabcontent');
-    allContents.forEach(el => el.style.display = 'none');
+    
+    
 
     if (activeParameter && activeContentType) {
+        const allContents = document.querySelectorAll('.tabcontent');
+        allContents.forEach(el => el.style.display = 'none');
         // Display the active parameter's content
         const activeTab = document.getElementById(activeParameter);
         activeTab.style.display = 'block';
@@ -130,10 +134,10 @@ var past_glucose_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
-        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'#f8d7da',
           lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
           //maxValue:1000,minValue:0
     }
@@ -158,9 +162,12 @@ var past_lactate_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'linear',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFFFFF', precision: 0 },
-        grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' },
-        //maxValue:30000,minValue:-30000
+        labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
+        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
+        grid: { strokeStyle:'#15b2d1', fillStyle:'#cce5ff',
+          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          //maxValue:1000,minValue:0
 
     }
 );
@@ -186,10 +193,10 @@ var past_vitamin_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
-        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+        grid: { strokeStyle:'#0eb579', fillStyle:'#d4edda',
           lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
           //maxValue:1000,minValue:0
     }
@@ -217,10 +224,10 @@ var past_ldopa_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+    labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
-        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+        grid: { strokeStyle:'#a89413', fillStyle:'#fff3cd',
           lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
           //maxValue:1000,minValue:0
     }
@@ -375,6 +382,7 @@ function incomingData(event) {
             case 'CH0':
                 // Add the value to the rawData array
                 console.log("CH0: ", value);
+                document.getElementById('glucoseCur').innerHTML = value;
                 document.getElementById('glucoseMax').innerHTML = stats.CH0.max;
                 document.getElementById('glucoseMean').innerHTML = (stats.CH0.sum / stats.CH0.count).toFixed(2);;
                 document.getElementById('glucoseMin').innerHTML = stats.CH0.min;
@@ -384,6 +392,7 @@ function incomingData(event) {
             case 'CH1':
                 // Add the value to the ecgData array
                 console.log("CH1: ", value);
+                document.getElementById('lactateCur').innerHTML = value;
                 document.getElementById('lactateMax').innerHTML = stats.CH1.max;
                 document.getElementById('lactateMean').innerHTML = (stats.CH1.sum / stats.CH1.count).toFixed(2);;
                 document.getElementById('lactateMin').innerHTML = stats.CH1.min;
@@ -393,6 +402,7 @@ function incomingData(event) {
             case 'CH2':
                 // Add the value to the ecgData array
                 console.log("CH2: ", value);
+                document.getElementById('vitamincCur').innerHTML = value;
                 document.getElementById('vitamincMax').innerHTML = stats.CH2.max;
                 document.getElementById('vitamincMean').innerHTML = (stats.CH2.sum / stats.CH2.count).toFixed(2);;
                 document.getElementById('vitamincMin').innerHTML = stats.CH2.min;
@@ -402,6 +412,7 @@ function incomingData(event) {
             case 'CH3':
                 // Add the value to the ecgData array
                 console.log("CH3: ", value);
+                document.getElementById('ldopaCur').innerHTML = value;
                 document.getElementById('ldopaMax').innerHTML = stats.CH3.max;
                 document.getElementById('ldopaMean').innerHTML = (stats.CH3.sum / stats.CH3.count).toFixed(2);;
                 document.getElementById('ldopaMin').innerHTML = stats.CH3.min;
@@ -549,19 +560,19 @@ async function sendInput() {
 
 
 function createTimeline() {
-    document.getElementById('glucosechart').height = window.innerHeight * 0.25;
+    document.getElementById('glucosechart').height = window.innerHeight * 0.2;
     document.getElementById('glucosechart').width = window.innerWidth * 0.8;
 
     document.getElementById('pastglucosechart').height = window.innerHeight * 0.10;
     document.getElementById('pastglucosechart').width = window.innerWidth * 0.4;
 
-    document.getElementById('vitaminchart').height = window.innerHeight * 0.25;
+    document.getElementById('vitaminchart').height = window.innerHeight * 0.2;
     document.getElementById('vitaminchart').width = window.innerWidth * 0.8;
 
     document.getElementById('pastvitaminchart').height = window.innerHeight * 0.1;
     document.getElementById('pastvitaminchart').width = window.innerWidth * 0.4;
 
-    document.getElementById('lactatechart').height = window.innerHeight * 0.25;
+    document.getElementById('lactatechart').height = window.innerHeight * 0.2;
     document.getElementById('lactatechart').width = window.innerWidth * 0.8;
 
 
@@ -569,7 +580,7 @@ function createTimeline() {
     document.getElementById('pastlactatechart').width = window.innerWidth * 0.4;
 
 
-    document.getElementById('ldopachart').height = window.innerHeight * 0.25;
+    document.getElementById('ldopachart').height = window.innerHeight * 0.2 ;
     document.getElementById('ldopachart').width = window.innerWidth * 0.8;
 
         

@@ -22,11 +22,9 @@
 
 <body onload="createTimeline();" onresize="adjust_width();" style="background-color: #EDEFE3;text-align: center">
 	<br />
-	<br />
-	<br />
 
-	<div id="stage" >
-		<button class="button button1" type="button" onclick="ble_connect()" style="width: 30%; text-align: center;">
+	<div id="stage" style="margin-bottom: 0px;">
+		<button class="button button1" type="button" onclick="ble_connect()" style="width: 30%;">
 			Start
 		</button>
 		
@@ -40,7 +38,7 @@
 		<textarea id="log" rows="5" cols="50" style="width: 1000px;"></textarea>
 	</div>
 	
-	<br /><br /><br />
+	<br />
 
 	<!-- Parameter Selection Buttons -->
 
@@ -68,18 +66,19 @@
 	
 
 
-	<div id="glucose" class="tabcontent">
+	<div id="glucose" class="tabcontent" style="display: block;">
 
 		<div style="background-color: #f8d7da; border-radius: 20px; height: 30%;">
-			<div class="chart" style="padding-top:5%;" >
+			<div class="chart" style="padding-top: 2%; display: none;" >
 				<canvas id="glucosechart" style="border-radius: 20px;"></canvas>
 			</div>
 	
 	
 			<div class="numerical">
-				<p class="lead">Max: <span id="glucoseMax">0</span></span></p>
-				<p class="lead">Mean: <span id="glucoseMean">0</span></p>
-				<p class="lead">Min: <span id="glucoseMin">0</span></p>
+				<p class="lead" style="padding-top: 4%;">Current: <span id="glucoseCur">0</span> mg/dL</p>
+				<p class="lead">Max: <span id="glucoseMax">0</span></span> mg/dL</p>
+				<p class="lead">Mean: <span id="glucoseMean">0</span> mg/dL</p>
+				<p class="lead" style="padding-bottom: 3.5%;">Min: <span id="glucoseMin">0</span> mg/dL</p>
 			</div>
 
 
@@ -95,15 +94,16 @@
 
 
 		<div style="background-color: #cce5ff; border-radius: 20px; height: 30%;">
-			<div class="chart" style="padding-top:5%;" >
+			<div class="chart" style="padding-top:2%;" >
 				<canvas id="lactatechart" style="border-radius: 20px;"></canvas>
 			</div>
 			
 			
 			<div class="numerical" >
-				<p class="lead">Max: <span id="lactateMax">0</span></span></p>
-				<p class="lead">Mean: <span id="lactateMean">0</span></p>
-				<p class="lead">Min: <span id="lactateMin">0</span></p>
+				<p class="lead" style="padding-top: 4%;">Current: <span id="lactateCur">0</span> mg/dL</p>
+				<p class="lead">Max: <span id="lactateMax">0</span> mg/dL</p>
+				<p class="lead">Mean: <span id="lactateMean">0</span> mg/dL</p>
+				<p class="lead" style="padding-bottom: 3.5%;>Min: <span id="lactateMin">0</span> mg/dL</p>
 			</div>
 
 
@@ -117,14 +117,15 @@
 		
 
 		<div style="background-color: #d4edda; border-radius: 20px; height: 30%;">
-			<div class="chart" style="padding-top:5%;">
+			<div class="chart" style="padding-top:2%;">
 				<canvas id="vitaminchart" style="border-radius: 20px;"></canvas>
 			</div>
 	
 			<div class="numerical" >
-				<p class="lead">Max: <span id="vitamincMax">0</span></span></p>
-				<p class="lead">Mean: <span id="vitamincMean">0</span></p>
-				<p class="lead">Min: <span id="vitamincMin">0</span></p>
+				<p class="lead" style="padding-top: 4%;">Current: <span id="vitamincCur">0</span> mg/dL</p>
+				<p class="lead">Max: <span id="vitamincMax">0</span> mg/dL</p>
+				<p class="lead">Mean: <span id="vitamincMean">0</span> mg/dL</p>
+				<p class="lead" style="padding-bottom: 3.5%;>Min: <span id="vitamincMin">0</span> mg/dL</p>
 			</div>
 
 
@@ -137,14 +138,15 @@
 		
 
 		<div style="background-color: #fff3cd; border-radius: 20px; height: 30%;">
-			<div class="chart" style="padding-top:5%;">
+			<div class="chart" style="padding-top:2%;">
 				<canvas id="ldopachart" style="border-radius: 20px;"></canvas>
 			</div>
 			
 			<div class="numerical">
-				<p class="lead">Max: <span id="ldopaMax">0</span></span></p>
-				<p class="lead">Mean: <span id="ldopaMean">0</span></p>
-				<p class="lead">Min: <span id="ldopaMin">0</span></p>
+				<p class="lead" style="padding-top: 4%;">Current: <span id="ldopaCur">0</span> mg/dL</p>
+				<p class="lead">Max: <span id="ldopaMax">0</span> mg/dL</p>
+				<p class="lead">Mean: <span id="ldopaMean">0</span> mg/dL</p>
+				<p class="lead" style="padding-bottom: 3.5%;>Min: <span id="ldopaMin">0</span> mg/dL</p>
 			</div>
 
 
@@ -173,10 +175,10 @@
 
 	<div id="past-glucose" class="" style="display: flex; background-color: #f8d7da; border-radius: 20px; align-items: center;">
 
-		<img src="icon/glucose.png" style="width: 100px; padding-left: 5vw;">
+		<img src="icon/glucose.png" style="width: 100px; padding-left: 5vw; padding-top: 8px; padding-bottom: 8px;">
 		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; width: 150px;">Glucose</label>
 		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastglucosechart" style="border-radius: 20px;"></canvas>
+			<canvas id="pastglucosechart" style=""></canvas>
 		</div>
 		
 		
@@ -188,7 +190,7 @@
 		<img src="icon/lactate.gif" style="width: 100px; padding-left: 5vw;">
 		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500;width: 150px;">Lactate</label>
 		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastlactatechart" style="border-radius: 20px;"></canvas>
+			<canvas id="pastlactatechart" style=""></canvas>
 		</div>
 		
 		
@@ -201,7 +203,7 @@
 		<img src="icon/vitaminC.png" style="width: 100px; padding-left: 5vw;">
 		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; white-space: nowrap; width: 150px;">Vita-C</label>
 		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastvitaminchart" style="border-radius: 20px;"></canvas>
+			<canvas id="pastvitaminchart" style=""></canvas>
 		</div>
 		
 		
@@ -213,7 +215,7 @@
 		<img src="icon/ldopa.png" style="width: 100px; padding-left: 5vw;">
 		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; white-space: nowrap; width: 150px;">L-Dopa</label>
 		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastldopachart" style="border-radius: 20px;"></canvas>
+			<canvas id="pastldopachart" style=""></canvas>
 		</div>
 		
 		
@@ -234,18 +236,16 @@
 </body>
 
 </html>
-<script>
-	document.querySelector('.button.button1').addEventListener('touchend', ble_connect);
-</script>
+
 <style>
 	#stage {
 		width: 90%;
-		border-radius: 50px;
+	
 		display: flex;
 		
 		align-items: center;
 		
-		gap: 10px;
+		
 		margin: auto;
 
 
@@ -256,6 +256,16 @@
 		display: flex; 
 		align-items: center; 
 		justify-content: center;
+
+	}
+
+	.lead{
+		margin: 0px;
+		text-align: left;
+		font-size: large;
+		font-weight: 500;
+		padding-left: 30%;
+
 
 	}
 
