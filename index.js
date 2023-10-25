@@ -17,7 +17,7 @@ var UART_SVC_UUID = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 var TX_CHAR_UUID = "00e00000-0001-11e1-ac36-0002a5d5c51b"; */
 // p2p service id
 // write characteristic
-var RX_CHAR_UUID   = "0000fe42-8e22-4541-9d4c-21edae82ed19";
+var RX_CHAR_UUID   = "0000fe41-8e22-4541-9d4c-21edae82ed19";
 // notify characteristic
 var TX_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19"; 
 
@@ -255,13 +255,44 @@ let stats = {
 
 function incomingData(event) {
     // Get the raw data
+    log("in incomingData");
     let rawData = event.target.value;
+    console.log("Is rawData defined?", rawData !== undefined);
+    console.log("Byte length:", rawData.byteLength);
+ 
+    let byteArray = new Uint8Array(rawData.buffer);
+    console.log("Byte values:", byteArray);
 
-    // Convert the data to a string
-    let strData = new TextDecoder().decode(rawData);
+    //let byteArray = new Uint8Array([yourFirstByte, yourSecondByte]); // Replace with your bytes
+    let view = new DataView(byteArray.buffer);
+    let intValue = view.getUint16(0, false);  // 'true' means little-endian
+    console.log("Interpreted integer value (little-endian):", intValue);
+    document.getElementById('ketoneLevel').textContent = `${intValue}`;
+
+    const circle = document.querySelector('#ring circle');
+
+	// Define ketone level ranges and corresponding colors
+	const levelRanges = [
+	{ max: 0.6, color: 'green' },
+	{ max: 1.5, color: 'yellow' },
+	{ max: 3.0, color: 'orange' },
+	{ max: Infinity, color: 'red' },
+	];
+
+	// Determine the color based on the ketone level
+	let color;
+	for (const range of levelRanges) {
+	if (intValue <= range.max) {
+		color = range.color;
+		break;
+	}
+	}
+
+	// Set the stroke color of the circle based on the ketone level
+	circle.setAttribute('stroke', color);
 
     // Split the string into lines
-    let lines = strData.split('\n');
+   /*  let lines = strData.split('\n');
 
     for(let line of lines){
         // Parse the channel and value from the line
@@ -317,7 +348,7 @@ function incomingData(event) {
                 graphRaw(0,0,0,value);
                 break;
         }
-    }
+    } */
 }
 
 function parseProcessed(data) {
@@ -395,7 +426,7 @@ async function ble_connect() {
         device = await navigator.bluetooth.requestDevice({
             //acceptAllDevices : true,
             //filters: [{ name: 'WB5M DK' }],
-            filters: [{ namePrefix: 'WB5M' }],
+            filters: [{ namePrefix: 'P2P' }],
             optionalServices: [serviceUuid]
         });
         //var RX_CHAR_UUID = prompt("Please enter the RX Characteristic UUID", "00000000-0000-0000-0000-000000000000"); // User input for the RX characteristic UUID
@@ -412,9 +443,9 @@ async function ble_connect() {
         const flowcontrolChar = await service.getCharacteristic(characteristicUuid_2);
         
         
-        setTimeout(() => {
+        /* setTimeout(() => {
             console.log("Delayed for 10 seconds.");
-          }, "10000");
+          }, "10000"); */
         // Subscribe to notifications
         log("connected");
         await flowcontrolChar.startNotifications();
