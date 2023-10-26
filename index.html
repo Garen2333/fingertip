@@ -4,7 +4,7 @@
 <head>
 
 	<meta charset="UTF-8">
-	<title>Ketone v0.0.1</title>
+	<title>Insole v0.0.1</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="main.css">
 	<script type="text/javascript" src="./smoothie.js"></script>
@@ -28,7 +28,7 @@
 
 		
 	
-		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px;">
+		<div style="padding: 5px; display: flex; align-items: center; padding-left: 10px; border: 1px solid #aaa; margin: 5px; border-radius: 10px; display: none;">
 			<div style="display: flex; align-items: center;">
 				<label for="input" style="font-size: 30px;">Command</label>
 				<img src="icon/terminal.png" style="height: 30px; margin-left: 10px;">
@@ -59,14 +59,16 @@
 
 	</div>
 
+
+
 	<div id="dashboard" style="margin: auto;">
 		
-		<svg id="ring" width="250px" height="250px">
-		  <circle cx="100" cy="105" r="90" fill="none" stroke-width="20" />
-		</svg>
-		<div id="ketoneLevel">0</div>
-		<div id="ketoneunit">mmol/L</div>
-		<div id="label">Ketone</div>
+		
+	</div>
+
+
+	<div style="text-align: center;"> 
+		<p id="ketoneLevel">0</p>
 	</div>
 
 
@@ -76,7 +78,7 @@
 	</div>
 	
 	<br />
-	<div class="tab" >
+	<div class="tab" style="display: none;" >
 		<button class="tablinks" onclick="openTab(event, 'chart-area')" style="font-size: 23px; font-weight: 500;">Raw Data Graph</button>
 		<button class="tablinks" onclick="openTab(event, 'numerical-data')" style="font-size: 23px; font-weight: 500;">Concentration Graph</button>
 	</div>
@@ -93,7 +95,7 @@
 		<br />L-dopa<br />
 		<canvas id="ecgchart" width="1200" height="120"></canvas><br />
 	</div> -->
-	<div id="chart-area" class="tabcontent" style="">
+	<div id="chart-area" class="tabcontent" style="display: none;">
 		
 		<div style="background-color: #fff3cd; border-radius: 50px; margin: 20px 20px">
 			<br />
@@ -103,7 +105,7 @@
 		</div>
 	</div>
 
-	<div id="numerical-data" class="tabcontent" style="">
+	<div id="numerical-data" class="tabcontent" style="display: none;">
 
 		<div style="background-color: #fff3cd; border-radius: 50px; margin: 20px 20px">
 			<br />
@@ -193,42 +195,23 @@
 
 
 	#dashboard {
+	background: url('icon/insoles.png') no-repeat center; 
 	position: relative;
-	width: 200px;
-	height: 200px;
+	width: 100vw;
+	height: 63vh;
 	}
 
 	#ring {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 10%;
+	left: 6vw;
 	}
 
 	#ketoneLevel {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	
+	
 	font-size:55px;
 	font-weight: bold;
-	}
-
-	#ketoneunit {
-	position: absolute;
-	top: 75%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	font-size: 18px;
-	font-weight: bold;
-	}
-
-	#label {
-	position: absolute;
-	top: 15%;
-	left: 50%;
-	transform: translate(-50%, 20%);
-	font-size: 18px;
-	font-weight: bolder;
 	}
 
 	#stage {
@@ -270,6 +253,36 @@
 		
 		text-align: center; 
 		height: 300px;
+	}
+
+
+	.sensor {
+            width: 50px;
+            height: 50px;
+            background-color: #f00;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%; /* Making sensors circular */
+        }
+
+	.sensor-top {
+		top: 20vh; /* Adjusted to better fit foot shape */
+		left: 6vw;
+	}
+
+	.sensor-bottom {
+		bottom: 50px; /* Adjusted to better fit foot shape */
+	}
+
+	.insole {
+    width: 27vw;
+    height: 60vh;
+    background: url('icon/insoles.png') no-repeat center; 
+    background-size: cover; /* This ensures the image covers the whole div */
+    
+    position: relative;
+    margin: 50px auto;
 	}
 
 </style>
