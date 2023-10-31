@@ -253,6 +253,28 @@ let stats = {
     CH3: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
 };
 
+const simpleStats = require('simple-statistics');
+
+// Given data
+const input_data = [10, 13, 19, 107, 184, 221, 244];
+const output_data = [0.2, 0.24, 0.32, 1.42, 2.37, 2.84, 3.12];
+
+// Prepare data for the polynomial regression function
+const data = input_data.map((value, index) => [value, output_data[index]]);
+
+// Perform polynomial regression to get the coefficients
+// Using degree 6 since we have 7 data points and want to fit them perfectly.
+const coefficients = simpleStats.polynomialRegression(data, 6);
+
+// Prediction function
+function predict(coefficients, x) {
+    let result = 0;
+    coefficients.forEach((coeff, degree) => {
+        result += coeff * Math.pow(x, degree);
+    });
+    return result;
+}
+
 function incomingData(event) {
     // Get the raw data
     log("in incomingData");
@@ -265,31 +287,22 @@ function incomingData(event) {
 
     //let byteArray = new Uint8Array([yourFirstByte, yourSecondByte]); // Replace with your bytes
     let view = new DataView(byteArray.buffer);
-    let intValue = view.getUint16(0, false);  // 'true' means little-endian
+    let intValue = view.getUint16(0, true);  // 'true' means little-endian
     console.log("Interpreted integer value (little-endian):", intValue);
-    document.getElementById('ketoneLevel').textContent = `${intValue}`;
+    let voltage = (0.0133* intValue + 0.067).toFixed(2);
+
+    document.getElementById('ketoneLevel').textContent = `${voltage}`;
 
     const circle = document.querySelector('#ring circle');
 
 	// Define ketone level ranges and corresponding colors
-	const levelRanges = [
-	{ max: 0.6, color: 'green' },
-	{ max: 1.5, color: 'yellow' },
-	{ max: 3.0, color: 'orange' },
-	{ max: Infinity, color: 'red' },
-	];
+
 
 	// Determine the color based on the ketone level
-	let color;
-	for (const range of levelRanges) {
-	if (intValue <= range.max) {
-		color = range.color;
-		break;
-	}
-	}
+
 
 	// Set the stroke color of the circle based on the ketone level
-	circle.setAttribute('stroke', color);
+
 
     // Split the string into lines
    /*  let lines = strData.split('\n');
