@@ -2,7 +2,11 @@ var inboundChar;
 var outboundChar;
 var device;
 var packet_count = 0;
-
+let voltageData = [];
+let voltageChart;
+let voltageDataArray = [];
+let timeDataArray = []
+const maxDataPoints = 2000;  // adjust this as needed
 // Define the CodeLess UUIDs 
 //var BPP_SVC_UUID = "0000fe40-cc7a-482a-984a-7f2ed5b3e58f";
 /* // nbr uuid
@@ -23,6 +27,30 @@ var TX_CHAR_UUID = "0000fe42-8e22-4541-9d4c-21edae82ed19";
 
 var no_data_yet = true;
 
+
+window.onload = function() {
+    const ctx = document.getElementById('voltageChart').getContext('2d');
+    voltageChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeDataArray,
+            datasets: [{
+                label: 'Voltage over Time',
+                data: voltageDataArray,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
 
 
 function TimeSeriesWithMemory() {
@@ -198,62 +226,6 @@ function log(text) {
     textarea.scrollTop = textarea.scrollHeight;
 }
 
-function normalize(arr_in) {
-    var arr_ret, val_max, val_min, val_range;
-    val_min = Math.min(...arr_in);
-    val_max = Math.max(...arr_in);
-    val_range = val_max - val_min;
-
-    var arr_ret = arr_in.map( function(value) { 
-        return (value - val_min) / val_range;
-    } );
-
-    return arr_ret;
-  }
-
-// Incoming GATT notification was received
-/* async function incomingData(event) {
-
-    if (no_data_yet) {
-
-        if (alg_mode == 1){
-            document.getElementById('algchart').style.display = "none";
-            document.getElementById('chart-area').style = "display:inline;";
-            glucose_chart.start();
-            lactate_chart.start();
-        }
-        else{
-            //document.getElementById('alg-chart-area').style = "display:inline;";
-            document.getElementById('chart-area').style = "display:none;";
-            document.getElementById('spinner').style = "display:none;";
-            document.getElementById('algchart').style.display = "";
-        }
-       
-        no_data_yet = false;
-
-        for (let x = 0; x < test_chart_len; x++) {
-            xValues.push(x);
-          }
-    }
-    for (var i = 0; i < event.target.value.byteLength; i++) {
-        val = event.target.value.getUint8(i);
-        receivedData[i] = val;
-        console.log(event.target.value.byteLength);
-        log(val);
-    
-    }
-    console.log("receivedData: ", receivedData);
-    parseRaw(receivedData);
-} */
-
-let stats = {
-    CH0: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
-    CH1: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
-    CH2: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
-    CH3: {sum: 0, max: Number.MIN_VALUE, min: Number.MAX_VALUE, count: 0},
-};
-
-const simpleStats = require('simple-statistics');
 
 // Given data
 const input_data = [10, 13, 19, 107, 184, 221, 244];
@@ -264,7 +236,6 @@ const data = input_data.map((value, index) => [value, output_data[index]]);
 
 // Perform polynomial regression to get the coefficients
 // Using degree 6 since we have 7 data points and want to fit them perfectly.
-const coefficients = simpleStats.polynomialRegression(data, 6);
 
 // Prediction function
 function predict(coefficients, x) {
@@ -274,6 +245,7 @@ function predict(coefficients, x) {
     });
     return result;
 }
+
 
 function incomingData(event) {
     // Get the raw data
@@ -291,9 +263,29 @@ function incomingData(event) {
     console.log("Interpreted integer value (little-endian):", intValue);
     let voltage = (0.0133* intValue + 0.067).toFixed(2);
 
-    document.getElementById('ketoneLevel').textContent = `${voltage}`;
+    document.getElementById('voltage').textContent = `${voltage}`;
 
+    let currentTime = new Date();  // Get the current time
+    let entry = {
+        time: currentTime.toLocaleString(),
+        voltage: voltage
+    };
+
+    voltageData.push(entry);
+    voltageDataArray.push(voltage);
+    timeDataArray.push(currentTime);
+    console.log(voltageData); 
     const circle = document.querySelector('#ring circle');
+
+    
+    if(voltageDataArray.length > maxDataPoints) {
+        voltageDataArray.shift();  // remove the first item
+        timeDataArray.shift();
+    }
+
+    if (voltageChart) {
+        voltageChart.update();
+    }
 
 	// Define ketone level ranges and corresponding colors
 
@@ -464,7 +456,7 @@ async function ble_connect() {
         await flowcontrolChar.startNotifications();
         flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
         log('Ready to communicate!\n');
-        createTimeline();
+        
         //document.getElementById('chart-area').style = "display:inline;";
         
     }
@@ -501,36 +493,7 @@ async function sendInput() {
 }
 
 
-function createTimeline() {
 
-    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.8;
-    document.getElementById('concentrationchart').width = document.getElementById('stage').clientWidth * 0.8;
-    //document.getElementById('bpchart').width = document.getElementById('stage').clientWidth * 0.95;
-
-    glucose_chart.addTimeSeries(glucose_ts.ts, {
-        strokeStyle:'rgb(255, 0, 255)', fillStyle:'rgba(255, 0, 255, 0.3)', lineWidth:3
-
-    });
-
-    lactate_chart.addTimeSeries(lactate_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
-    });
-
-    concentration_chart.addTimeSeries(vitamin_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
-    });
-
-    ldopa_chart.addTimeSeries(ldopa_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
-    });
-
-
-    ldopa_chart.streamTo(document.getElementById("ldopachart"));
-    concentration_chart.streamTo(document.getElementById("concentrationchart"))
-}
 
 function calcChecksum()
 {
@@ -590,10 +553,6 @@ function createampStart(){
 
 }
 
-function adjust_width() {
-
-    document.getElementById('ldopachart').width = document.getElementById('stage').clientWidth * 0.8;
-}
 
 function interpolate(val_ppg, val_ecg) {
     var coef_a_ecg, coef_a_ppg, coef_b_ecg,
