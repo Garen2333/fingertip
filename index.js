@@ -249,18 +249,18 @@ function predict(coefficients, x) {
 
 function incomingData(event) {
     // Get the raw data
-    log("in incomingData");
+    //log("in incomingData");
     let rawData = event.target.value;
-    console.log("Is rawData defined?", rawData !== undefined);
-    console.log("Byte length:", rawData.byteLength);
+    //console.log("Is rawData defined?", rawData !== undefined);
+    //console.log("Byte length:", rawData.byteLength);
  
     let byteArray = new Uint8Array(rawData.buffer);
-    console.log("Byte values:", byteArray);
+    //console.log("Byte values:", byteArray);
 
     //let byteArray = new Uint8Array([yourFirstByte, yourSecondByte]); // Replace with your bytes
     let view = new DataView(byteArray.buffer);
     let intValue = view.getUint16(0, true);  // 'true' means little-endian
-    console.log("Interpreted integer value (little-endian):", intValue);
+    //console.log("Interpreted integer value (little-endian):", intValue);
     let voltage = (0.0133* intValue + 0.067).toFixed(2);
 
     document.getElementById('voltage').textContent = `${voltage}`;
@@ -274,7 +274,7 @@ function incomingData(event) {
     voltageData.push(entry);
     voltageDataArray.push(voltage);
     timeDataArray.push(currentTime);
-    console.log(voltageData); 
+    //console.log(voltageData); 
     const circle = document.querySelector('#ring circle');
 
     
@@ -588,7 +588,7 @@ function interpolate(val_ppg, val_ecg) {
 
 }
 
-function save(filename, data) {
+/* function save(filename, data) {
     
     if (alg_mode == 1) {
         filename += '_raw_';
@@ -630,217 +630,56 @@ function save(filename, data) {
             document.body.removeChild(elem);
         }
     }
+} */
+
+
+
+function save(filename) {
+    // Define the base filename and add the date
+    let baseFilename = filename || 'voltage_data';
+    let dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    let fullFilename = baseFilename + '_' + dateString + '.csv';
+
+    // Prepare the CSV content
+    let csvContent = "Date,Time,Voltage\n";
+
+    // Loop through each entry in the voltageData array
+    for (let entry of voltageData) {
+        let date = new Date(entry.time);
+        let formattedDate = date.toLocaleDateString();
+        let formattedTime = date.toLocaleTimeString();
+
+        // Add each entry as a new line in the CSV
+        csvContent += `${formattedDate},${formattedTime},${entry.voltage}\n`;
+    }
+
+    // Create a Blob from the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+
+    // Change button state to indicate saving
+    let saveButton = document.getElementById('savebutton');
+    saveButton.value = 'Saving...';
+    saveButton.classList.add('button3_on');
+    saveButton.classList.remove('button3');
+
+    // Download the CSV file
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, fullFilename);
+    } else {
+        const elem = document.createElement('a');
+        elem.href = URL.createObjectURL(blob);
+        elem.download = fullFilename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
+
+    // Reset the button state after saving
+    saveButton.value = 'Download Data';
+    saveButton.classList.add('button3');
+    saveButton.classList.remove('button3_on');
 }
 
-var DBP_AVGS = 4;
-var DBP_buffer = new Float32Array(DBP_AVGS);
-var DBP_int_buffer = new Int16Array(DBP_AVGS);
-var DBP_buffer_ind = 0;
-var num_DBPs = 0;
-function get_avg_DBP(new_DBP)
-{ //simple mean. Resets when passed a zero.
-	
-	var new_avg = 0;
-	var int_avg = 0;
-	var bits_of_prec = 12; //bits of precision
-	var rms = 0;
-	var new_ind;
-    var DBP_rms = 0;
-
-	if (new_DBP > 0)
-	{ //>0 valid, do average
-		num_DBPs++; //increment number to average
-		if (num_DBPs > DBP_AVGS) num_DBPs = DBP_AVGS; //truncate number of averages at max value
-		DBP_buffer[DBP_buffer_ind] = new_DBP; //load new sample into buffer
-		DBP_int_buffer[DBP_buffer_ind] = new_DBP * (2 ** bits_of_prec);
-		new_ind = DBP_buffer_ind; //get index of current latest sample
-
-		DBP_buffer_ind++; //increment buffer pointer for next time
-		if (DBP_buffer_ind == DBP_AVGS)
-			DBP_buffer_ind = 0; //loop back
-
-		for (var n = 0; n < num_DBPs; n++)
-		{
-			new_avg += DBP_buffer[new_ind]; //add each previous PI value
-			int_avg += DBP_int_buffer[new_ind];
-			new_ind--; //decrement pointer
-			if (new_ind < 0)
-				new_ind += DBP_AVGS; //loop back
-		}
-		new_avg /= num_DBPs;
-		int_avg /= num_DBPs;
-		new_ind = DBP_buffer_ind - 1;
-		if (new_ind < 0)
-			new_ind += DBP_AVGS; //loop back
-		for (var n = 0; n < num_DBPs; n++)
-		{
-			rms += ((DBP_int_buffer[new_ind] - int_avg)
-					* (DBP_int_buffer[new_ind] - int_avg));
-			new_ind--;
-			if (new_ind < 0)
-				new_ind += DBP_AVGS;
-		}
-		rms /= num_DBPs; //divide by number of samples
-		rms = Math.sqrt(rms); //square root
-		DBP_rms = rms * (2 ** (-bits_of_prec)); //convert back to float
-	}
-	else
-	{ //reset
-		new_avg = new_DBP;
-		num_DBPs = 0;
-		DBP_buffer_ind = 0;
-		DBP_rms = 0;
-	}
-
-	return {
-        'avg': Math.round(new_avg),
-        'rms': DBP_rms
-    };
-}
-
-var SBP_AVGS = 4;
-var SBP_buffer = new Float32Array(SBP_AVGS);
-var SBP_int_buffer = new Int16Array(SBP_AVGS);
-var SBP_buffer_ind = 0;
-var num_SBPs = 0;
-function get_avg_SBP(new_SBP) { //simple mean. Resets when passed a zero.
-
-    var new_avg = 0;
-    var int_avg = 0;
-    var bits_of_prec = 12; //bits of precision
-    var rms = 0;
-    var new_ind;
-    var SBP_rms = 0;
-
-    if (new_SBP > 0) { //>0 valid, do average
-        num_SBPs++; //increment number to average
-        if (num_SBPs > SBP_AVGS) num_SBPs = SBP_AVGS; //truncate number of averages at max value
-        SBP_buffer[SBP_buffer_ind] = new_SBP; //load new sample into buffer
-        SBP_int_buffer[SBP_buffer_ind] = new_SBP * (2 ** bits_of_prec);
-        new_ind = SBP_buffer_ind; //get index of current latest sample
-
-        SBP_buffer_ind++; //increment buffer pointer for next time
-        if (SBP_buffer_ind == SBP_AVGS)
-            SBP_buffer_ind = 0; //loop back
-
-        for (var n = 0; n < num_SBPs; n++) {
-            new_avg += SBP_buffer[new_ind]; //add each previous PI value
-            int_avg += SBP_int_buffer[new_ind];
-            new_ind--; //decrement pointer
-            if (new_ind < 0)
-                new_ind += SBP_AVGS; //loop back
-        }
-        new_avg /= num_SBPs;
-        int_avg /= num_SBPs;
-        new_ind = SBP_buffer_ind - 1;
-        if (new_ind < 0)
-            new_ind += SBP_AVGS; //loop back
-        for (var n = 0; n < num_SBPs; n++) {
-            rms += ((SBP_int_buffer[new_ind] - int_avg)
-                * (SBP_int_buffer[new_ind] - int_avg));
-            new_ind--;
-            if (new_ind < 0)
-                new_ind += SBP_AVGS;
-        }
-        rms /= num_SBPs; //divide by number of samples
-        rms = Math.sqrt(rms); //square root
-        SBP_rms = rms * (2 ** (-bits_of_prec)); //convert back to float
-    }
-    else { //reset
-        new_avg = new_SBP;
-        num_SBPs = 0;
-        SBP_buffer_ind = 0;
-        SBP_rms = 0;
-    }
-
-    return {
-        'avg': Math.round(new_avg),
-        'rms': SBP_rms
-    };
-}
-
-function formatDate(date, format, utc) {
-    var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    var dddd = ["\x02", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    var ddd = ["\x03", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    function ii(i, len) {
-        var s = i + "";
-        len = len || 2;
-        while (s.length < len) s = "0" + s;
-        return s;
-    }
-
-    var y = utc ? date.getUTCFullYear() : date.getFullYear();
-    format = format.replace(/(^|[^\\])yyyy+/g, "$1" + y);
-    format = format.replace(/(^|[^\\])yy/g, "$1" + y.toString().substr(2, 2));
-    format = format.replace(/(^|[^\\])y/g, "$1" + y);
-
-    var M = (utc ? date.getUTCMonth() : date.getMonth()) + 1;
-    format = format.replace(/(^|[^\\])MMMM+/g, "$1" + MMMM[0]);
-    format = format.replace(/(^|[^\\])MMM/g, "$1" + MMM[0]);
-    format = format.replace(/(^|[^\\])MM/g, "$1" + ii(M));
-    format = format.replace(/(^|[^\\])M/g, "$1" + M);
-
-    var d = utc ? date.getUTCDate() : date.getDate();
-    format = format.replace(/(^|[^\\])dddd+/g, "$1" + dddd[0]);
-    format = format.replace(/(^|[^\\])ddd/g, "$1" + ddd[0]);
-    format = format.replace(/(^|[^\\])dd/g, "$1" + ii(d));
-    format = format.replace(/(^|[^\\])d/g, "$1" + d);
-
-    var H = utc ? date.getUTCHours() : date.getHours();
-    format = format.replace(/(^|[^\\])HH+/g, "$1" + ii(H));
-    format = format.replace(/(^|[^\\])H/g, "$1" + H);
-
-    var h = H > 12 ? H - 12 : H == 0 ? 12 : H;
-    format = format.replace(/(^|[^\\])hh+/g, "$1" + ii(h));
-    format = format.replace(/(^|[^\\])h/g, "$1" + h);
-
-    var m = utc ? date.getUTCMinutes() : date.getMinutes();
-    format = format.replace(/(^|[^\\])mm+/g, "$1" + ii(m));
-    format = format.replace(/(^|[^\\])m/g, "$1" + m);
-
-    var s = utc ? date.getUTCSeconds() : date.getSeconds();
-    format = format.replace(/(^|[^\\])ss+/g, "$1" + ii(s));
-    format = format.replace(/(^|[^\\])s/g, "$1" + s);
-
-    var f = utc ? date.getUTCMilliseconds() : date.getMilliseconds();
-    format = format.replace(/(^|[^\\])fff+/g, "$1" + ii(f, 3));
-    f = Math.round(f / 10);
-    format = format.replace(/(^|[^\\])ff/g, "$1" + ii(f));
-    f = Math.round(f / 10);
-    format = format.replace(/(^|[^\\])f/g, "$1" + f);
-
-    var T = H < 12 ? "AM" : "PM";
-    format = format.replace(/(^|[^\\])TT+/g, "$1" + T);
-    format = format.replace(/(^|[^\\])T/g, "$1" + T.charAt(0));
-
-    var t = T.toLowerCase();
-    format = format.replace(/(^|[^\\])tt+/g, "$1" + t);
-    format = format.replace(/(^|[^\\])t/g, "$1" + t.charAt(0));
-
-    var tz = -date.getTimezoneOffset();
-    var K = utc || !tz ? "Z" : tz > 0 ? "+" : "-";
-    if (!utc) {
-        tz = Math.abs(tz);
-        var tzHrs = Math.floor(tz / 60);
-        var tzMin = tz % 60;
-        K += ii(tzHrs) + ":" + ii(tzMin);
-    }
-    format = format.replace(/(^|[^\\])K/g, "$1" + K);
-
-    var day = (utc ? date.getUTCDay() : date.getDay()) + 1;
-    format = format.replace(new RegExp(dddd[0], "g"), dddd[day]);
-    format = format.replace(new RegExp(ddd[0], "g"), ddd[day]);
-
-    format = format.replace(new RegExp(MMMM[0], "g"), MMMM[M]);
-    format = format.replace(new RegExp(MMM[0], "g"), MMM[M]);
-
-    format = format.replace(/\\(.)/g, "$1");
-
-    return format;
-};
 
 function openTab(evt, chartName) {
 	// Declare all variables
