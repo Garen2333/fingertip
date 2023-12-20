@@ -94,7 +94,7 @@ var glucose_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(0, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(248, 215, 218)',
@@ -110,11 +110,11 @@ var past_glucose_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
+        labels: { fontSize: 0, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'#f8d7da',
-          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+          lineWidth: 1, millisPerLine: 5000, verticalSections: 6, },
           maxValue:160,minValue:80
     }
 );
@@ -125,7 +125,7 @@ var lactate_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         grid: {strokeStyle:'rgb(153, 150, 150)',millisPerLine: 12000, verticalSections: 6, fillStyle: 'rgb(204, 229, 255)' },
         maxValue:50,minValue:5
 
@@ -138,7 +138,7 @@ var past_lactate_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'linear',
         tooltip: true,
-        labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
+        labels: { fontSize: 0, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'#15b2d1', fillStyle:'#cce5ff',
@@ -154,7 +154,7 @@ var vitamin_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(212, 237, 218)',
@@ -169,7 +169,7 @@ var past_vitamin_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
+        labels: { fontSize: 0, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'#0eb579', fillStyle:'#d4edda',
@@ -185,7 +185,7 @@ var ldopa_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(255, 243, 205)',
@@ -200,7 +200,7 @@ var past_ldopa_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-    labels: { fontSize: 10, fillStyle: 'black', precision: 0 },
+        labels: { fontSize: 0, fillStyle: 'black', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'#a89413', fillStyle:'#fff3cd',
@@ -303,7 +303,8 @@ function readAndProcessCSV() {
         complete: function(results) {
             console.log("CSV data:", results.data);
             csvData = results.data; // Store the parsed data
-            setInterval(updateGraphs, 2000); // Update the graph every 2 seconds
+            updateGraphs();
+            setInterval(updateGraphs, 2500); // Update the graph every 2 seconds
         }
     });
 }
