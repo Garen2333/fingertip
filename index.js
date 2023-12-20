@@ -24,42 +24,7 @@ var TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50r24dcca9e";
 var no_data_yet = true;
 
 
-let activeParameter = glucose;
-let activeContentType = null;
 
-function setActiveParameter(parameter) {
-    activeParameter = parameter;
-    log(activeParameter);
-    updateDisplay();
-}
-
-function setActiveContentType(type) {
-    activeContentType = type;
-    log(activeParameter);
-    updateDisplay();
-}
-
-function updateDisplay() {
-    // First, hide all tab contents
-    
-    
-
-    if (activeParameter && activeContentType) {
-        const allContents = document.querySelectorAll('.tabcontent');
-        allContents.forEach(el => el.style.display = 'none');
-        // Display the active parameter's content
-        const activeTab = document.getElementById(activeParameter);
-        activeTab.style.display = 'block';
-
-        // Within that tab, hide all content types
-        const allTypes = activeTab.querySelectorAll('.chart, .numerical');
-        allTypes.forEach(el => el.style.display = 'none');
-
-        // Display the active content type
-        const activeType = activeTab.querySelector(`.${activeContentType}`);
-        activeType.style.display = 'block';
-    }
-}
 
 function TimeSeriesWithMemory() {
     this.ts = new TimeSeries();
@@ -77,6 +42,11 @@ var glucose_ts = new TimeSeriesWithMemory();
 var lactate_ts = new TimeSeriesWithMemory();
 var vitamin_ts = new TimeSeriesWithMemory();
 var ldopa_ts = new TimeSeriesWithMemory();
+
+var past_glucose_ts = new TimeSeriesWithMemory();
+var past_lactate_ts = new TimeSeriesWithMemory();
+var past_vitamin_ts = new TimeSeriesWithMemory();
+var past_ldopa_ts = new TimeSeriesWithMemory();
 
 var state = 0;
 var receivedData = [];
@@ -112,18 +82,24 @@ var test_chart_len = 500;
 
 var alg_mode = 1;
 
+
+var chartWidth = document.getElementById('stage').clientWidth * 0.4;
+var totalDisplayMillis = 60000; // 60 seconds in milliseconds
+var millisPerPixel = totalDisplayMillis / chartWidth;
+
+
 var glucose_chart = new SmoothieChart(
     {
-        millisPerPixel: 10,
+        millisPerPixel: millisPerPixel,
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
-        //labels: { fillStyle:'rgb(60, 0, 0)' },
+        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        //labels: { fillStyle:'rgb(0, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
-        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
-          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
-          //maxValue:1000,minValue:0
+        grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(248, 215, 218)',
+          lineWidth: 0.5, millisPerLine: 12000, verticalSections: 6, },
+          maxValue:160,minValue:80
     }
 );
 
@@ -139,19 +115,19 @@ var past_glucose_chart = new SmoothieChart(
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'#f8d7da',
           lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
-          //maxValue:1000,minValue:0
+          maxValue:160,minValue:80
     }
 );
 
 var lactate_chart = new SmoothieChart(
     {
-        millisPerPixel: 10,
+        millisPerPixel: millisPerPixel,
         timestampFormatter: SmoothieChart.timeFormatter,
-        interpolation: 'linear',
+        interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFFFFF', precision: 0 },
-        grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' },
-        //maxValue:30000,minValue:-30000
+        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        grid: {strokeStyle:'rgb(153, 150, 150)',millisPerLine: 12000, verticalSections: 6, fillStyle: 'rgb(204, 229, 255)' },
+        maxValue:50,minValue:5
 
     }
 );
@@ -167,23 +143,23 @@ var past_lactate_chart = new SmoothieChart(
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'#15b2d1', fillStyle:'#cce5ff',
           lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
-          //maxValue:1000,minValue:0
+          maxValue:50,minValue:5
 
     }
 );
 
 var vitamin_chart = new SmoothieChart(
     {
-        millisPerPixel: 10,
+        millisPerPixel: millisPerPixel,
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
-        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
-          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
-          //maxValue:1000,minValue:0
+        grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(212, 237, 218)',
+          lineWidth: 1, millisPerLine: 12000, verticalSections: 6, },
+          maxValue:50,minValue:0
     }
 );
 
@@ -198,22 +174,22 @@ var past_vitamin_chart = new SmoothieChart(
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'#0eb579', fillStyle:'#d4edda',
           lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
-          //maxValue:1000,minValue:0
+        maxValue:50,minValue:0
     }
 );
 
 
 var ldopa_chart = new SmoothieChart(
     {
-        millisPerPixel: 10,
+        millisPerPixel: millisPerPixel,
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#FFF704', precision: 0 },
+        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
-        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
-          lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+        grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(255, 243, 205)',
+          lineWidth: 1, millisPerLine: 12000, verticalSections: 6, },
           //maxValue:1000,minValue:0
     }
 );
@@ -309,6 +285,117 @@ function normalize(arr_in) {
     return arr_ret;
   }
 
+
+var csvData; // Store the CSV data
+var currentIndex = 0; // Index to keep track of the current row being processed
+var glucoseStats = { sum: 0, max: -Infinity, min: Infinity, count: 0 };
+var lactateStats = { sum: 0, max: -Infinity, min: Infinity, count: 0 };
+var vitaminStats = { sum: 0, max: -Infinity, min: Infinity, count: 0 };
+var glucoseData = [];
+var lactateData = [];
+var vitaminData = [];
+// Function to read and process the CSV file
+function readAndProcessCSV() {
+    Papa.parse('onBodyData.csv', {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: function(results) {
+            console.log("CSV data:", results.data);
+            csvData = results.data; // Store the parsed data
+            setInterval(updateGraphs, 2000); // Update the graph every 2 seconds
+        }
+    });
+}
+
+// Update the updateGraphs function to include data storage
+function updateGraphs() {
+    if (currentIndex < csvData.length) {
+        var row = csvData[currentIndex];
+        var time = new Date();
+
+        updateStatsAndGraph(time, row.glucose, glucose_ts, glucoseStats, 'glucose', glucoseData);
+        updateStatsAndGraph(time, row.lactate, lactate_ts, lactateStats, 'lactate', lactateData);
+        updateStatsAndGraph(time, row.vitaminC, vitamin_ts, vitaminStats, 'vitaminc', vitaminData);
+
+
+        updateStatsAndGraph(time, row.glucose, past_glucose_ts, glucoseStats, 'glucose', glucoseData);
+        updateStatsAndGraph(time, row.lactate, past_lactate_ts, lactateStats, 'lactate', lactateData);
+        updateStatsAndGraph(time, row.vitaminC, past_vitamin_ts, vitaminStats, 'vitaminc', vitaminData);
+
+        currentIndex++;
+    } else {
+        console.log("Reached the end of the CSV data");
+        clearInterval(this);
+    }
+}
+
+// Function to update statistics and graph for a given type
+function updateStatsAndGraph(time, value, ts, stats, elementIdPrefix, dataArray) {
+    if (value !== undefined && !isNaN(value)) {
+        ts.append(time, value);
+        
+        stats.sum += value;
+        stats.max = Math.max(stats.max, value);
+        stats.min = Math.min(stats.min, value);
+        stats.count += 1;
+
+        updateStatsDisplay(stats, elementIdPrefix);
+
+        // Store the data along with the timestamp
+        dataArray.push({ time: time.toISOString(), value: value });
+
+        document.getElementById(elementIdPrefix + 'Cur').textContent = value.toFixed(2);
+    }
+}
+
+// Function to update the statistics display
+function updateStatsDisplay(stats, elementIdPrefix) {
+    var mean = stats.count > 0 ? (stats.sum / stats.count) : 0;
+    document.getElementById(elementIdPrefix + 'Max').textContent = stats.max.toFixed(2);
+    document.getElementById(elementIdPrefix + 'Min').textContent = stats.min.toFixed(2);
+    document.getElementById(elementIdPrefix + 'Mean').textContent = mean.toFixed(2);
+    //document.getElementById(elementIdPrefix + 'Cur').textContent = mean.toFixed(2);
+}
+
+
+
+let activeParameter = 'glucose';
+let activeContentType = null;
+
+function setActiveParameter(parameter) {
+    activeParameter = parameter;
+    log(activeParameter);
+    updateDisplay();
+}
+
+function setActiveContentType(type) {
+    activeContentType = type;
+    log(activeParameter);
+    updateDisplay();
+}
+
+function updateDisplay() {
+    // First, hide all tab contents
+    
+    
+
+    if (activeParameter && activeContentType) {
+        const allContents = document.querySelectorAll('.tabcontent');
+        allContents.forEach(el => el.style.display = 'none');
+        // Display the active parameter's content
+        const activeTab = document.getElementById(activeParameter);
+        activeTab.style.display = 'block';
+
+        // Within that tab, hide all content types
+        const allTypes = activeTab.querySelectorAll('.chart, .numerical');
+        allTypes.forEach(el => el.style.display = 'none');
+
+        // Display the active content type
+        const activeType = activeTab.querySelector(`.${activeContentType}`);
+        activeType.style.display = 'block';
+    }
+}
 // Incoming GATT notification was received
 /* async function incomingData(event) {
 
@@ -590,34 +677,30 @@ function createTimeline() {
     //document.getElementById('bpchart').width = document.getElementById('stage').clientWidth * 0.95;
 
     glucose_chart.addTimeSeries(glucose_ts.ts, {
-        strokeStyle:'rgb(255, 0, 255)', fillStyle:'rgba(255, 0, 255, 0.3)', lineWidth:3
+        strokeStyle:'rgb(242, 73, 88)', fillStyle:'rgba(242, 73, 88, 0.3)', lineWidth:3
 
     });
 
 
-    past_glucose_chart.addTimeSeries(glucose_ts.ts, {
-        strokeStyle:'rgb(255, 0, 255)', fillStyle:'rgba(255, 0, 255, 0.3)', lineWidth:3
+    past_glucose_chart.addTimeSeries(past_glucose_ts.ts, {
+        strokeStyle:'rgb(242, 73, 88)', fillStyle:'rgba(242, 73, 88, 0.3)', lineWidth:3
 
     });
 
     lactate_chart.addTimeSeries(lactate_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
+        strokeStyle:'rgb(15, 198, 211)', fillStyle:'rgba(68, 229, 240, 0.3)', lineWidth:3
     });
 
-    past_lactate_chart.addTimeSeries(lactate_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
+    past_lactate_chart.addTimeSeries(past_lactate_ts.ts, {
+        strokeStyle:'rgb(15, 198, 211)', fillStyle:'rgba(68, 229, 240, 0.3)', lineWidth:3
     });
 
     vitamin_chart.addTimeSeries(vitamin_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
+        strokeStyle:'rgb(35, 219, 9)', fillStyle:'rgba(114, 236, 97,0.3)', lineWidth:3
     });
 
-    past_vitamin_chart.addTimeSeries(vitamin_ts.ts, {
-        strokeStyle: 'rgba(255, 0, 0, 1)',
-        lineWidth: 1
+    past_vitamin_chart.addTimeSeries(past_vitamin_ts.ts, {
+        strokeStyle:'rgb(35, 219, 9)', fillStyle:'rgba(114, 236, 97,0.3)', lineWidth:3
     });
 
     ldopa_chart.addTimeSeries(ldopa_ts.ts, {
@@ -625,7 +708,7 @@ function createTimeline() {
         lineWidth: 1
     });
 
-    past_ldopa_chart.addTimeSeries(ldopa_ts.ts, {
+    past_ldopa_chart.addTimeSeries(past_ldopa_ts.ts, {
         strokeStyle: 'rgba(255, 0, 0, 1)',
         lineWidth: 1
     });
