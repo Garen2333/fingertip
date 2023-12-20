@@ -85,7 +85,7 @@ var glucose_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(0, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(248, 215, 218)',
@@ -100,7 +100,7 @@ var lactate_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         grid: {strokeStyle:'rgb(153, 150, 150)',millisPerLine: 12000, verticalSections: 6, fillStyle: 'rgb(204, 229, 255)' },
         maxValue:50,minValue:5
 
@@ -113,7 +113,7 @@ var vitamin_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(212, 237, 218)',
@@ -129,7 +129,7 @@ var ldopa_chart = new SmoothieChart(
         timestampFormatter: SmoothieChart.timeFormatter,
         interpolation: 'bezier',
         tooltip: true,
-        labels: { fontSize: 15, fillStyle: '#000000', precision: 0 },
+        labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(255, 243, 205)',
