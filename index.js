@@ -304,7 +304,7 @@ function readAndProcessCSV() {
             console.log("CSV data:", results.data);
             csvData = results.data; // Store the parsed data
             updateGraphs();
-            setInterval(updateGraphs, 2500); // Update the graph every 2 seconds
+            setInterval(updateGraphs, 5000); // Update the graph every 2 seconds
         }
     });
 }
