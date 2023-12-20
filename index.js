@@ -362,7 +362,7 @@ function updateStatsDisplay(stats, elementIdPrefix) {
 
 
 let activeParameter = 'glucose';
-let activeContentType = null;
+let activeContentType = 'numerical';
 
 function setActiveParameter(parameter) {
     activeParameter = parameter;
