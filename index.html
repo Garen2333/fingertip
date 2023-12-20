@@ -11,6 +11,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 	<script src="./index.js" defer></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	
 
@@ -159,7 +161,7 @@
 	<!-- <canvas id="bpchart" width="1200" height="300"></canvas><br /> -->
 
 	<div id="stage" >
-		<button class="button button1" type="button" onclick="ble_connect()">
+		<button class="button button1" type="button" onclick="readAndProcessCSV()">
 			Connect To Device
 		</button>
 		
@@ -172,7 +174,7 @@
 			Reconnect
 		</button>
 		
-		<input id="savebutton" class="button button3" type="button" onclick="save('bp_patch', dataLog);" value="Download Data">
+		<input id="savebutton" class="button button3" type="button" onclick="downloadData();" value="Download Data">
 	</div>
 
 	<style>
