@@ -77,7 +77,7 @@ var test_chart_len = 500;
 var alg_mode = 1;
 
 var chartWidth = document.getElementById('stage').clientWidth * 0.4;
-var totalDisplayMillis = 60000; // 60 seconds in milliseconds
+var totalDisplayMillis = 750000; // 60 seconds in milliseconds
 var millisPerPixel = totalDisplayMillis / chartWidth;
 var glucose_chart = new SmoothieChart(
     {
@@ -89,8 +89,8 @@ var glucose_chart = new SmoothieChart(
         //labels: { fillStyle:'rgb(0, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(248, 215, 218)',
-          lineWidth: 0.5, millisPerLine: 12000, verticalSections: 6, },
-          maxValue:160,minValue:80
+          lineWidth: 0.5, millisPerLine: 60000, verticalSections: 6, },
+          maxValue:120,minValue:60
     }
 );
 
@@ -101,7 +101,7 @@ var lactate_chart = new SmoothieChart(
         interpolation: 'bezier',
         tooltip: true,
         labels: { fontSize: 0, fillStyle: '#000000', precision: 0 },
-        grid: {strokeStyle:'rgb(153, 150, 150)',millisPerLine: 12000, verticalSections: 6, fillStyle: 'rgb(204, 229, 255)' },
+        grid: {strokeStyle:'rgb(153, 150, 150)',millisPerLine: 60000, verticalSections: 6, fillStyle: 'rgb(204, 229, 255)' },
         maxValue:50,minValue:5
 
     }
@@ -117,7 +117,7 @@ var vitamin_chart = new SmoothieChart(
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(212, 237, 218)',
-          lineWidth: 1, millisPerLine: 12000, verticalSections: 6, },
+          lineWidth: 1, millisPerLine: 60000, verticalSections: 6, },
           maxValue:50,minValue:0
     }
 );
@@ -133,7 +133,7 @@ var ldopa_chart = new SmoothieChart(
         //labels: { fillStyle:'rgb(60, 0, 0)' },
         //grid: { borderVisible: false, millisPerLine: 2000, verticalSections: 21, fillStyle: '#000000' }
         grid: { strokeStyle:'rgb(153, 150, 150)', fillStyle:'rgb(255, 243, 205)',
-          lineWidth: 1, millisPerLine: 12000, verticalSections: 6, },
+          lineWidth: 1, millisPerLine: 60000, verticalSections: 6, },
           //maxValue:1000,minValue:0
     }
 );
@@ -405,7 +405,7 @@ function readAndProcessCSV() {
         complete: function(results) {
             console.log("CSV data:", results.data);
             csvData = results.data; // Store the parsed data
-            setInterval(updateGraphs, 2000); // Update the graph every 2 seconds
+            setInterval(updateGraphs, 5000); // Update the graph every 2 seconds
         }
     });
 }
@@ -417,7 +417,7 @@ function updateGraphs() {
         var time = new Date();
 
         updateStatsAndGraph(time, row.glucose, glucose_ts, glucoseStats, 'glucose', glucoseData);
-        updateStatsAndGraph(time, row.lactate, lactate_ts, lactateStats, 'lactate', lactateData);
+        //updateStatsAndGraph(time, row.lactate, lactate_ts, lactateStats, 'lactate', lactateData);
         updateStatsAndGraph(time, row.vitaminC, vitamin_ts, vitaminStats, 'vitaminc', vitaminData);
 
         currentIndex++;
