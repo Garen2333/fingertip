@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Data Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Real-time Data Plot</h2>
+    <canvas id="realtimeChart" width="400" height="200"></canvas>
+
+    <script>
+        // Initialize the chart
+        var ctx = document.getElementById('realtimeChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Time labels
+                datasets: [{
+                    label: 'Live Data',
+                    data: [], // Data points
+                    borderColor: 'rgb(75, 192, 192)',
+                    fill: false,
+                    pointRadius: 5, // Increase point size to make them visible
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Time (s)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Function to add new data points every 15 seconds
+        var time = 0; // Initialize time counter
+        function addDataPoint() {
+            time += 15; // Increment time by 15 seconds
+            var newDataValue = Math.floor(Math.random() * 100); // Simulate a new data value
+
+            chart.data.labels.push(time); // Add the time to the labels array
+            chart.data.datasets[0].data.push(newDataValue); // Add the new data value to the dataset
+
+            // Update the chart to reflect the new data
+            chart.update();
+        }
+
+        // Add a new data point every 15 seconds
+        setInterval(addDataPoint, 1000);
+
+        // Add the first data point immediately
+        addDataPoint();
+    </script>
+</body>
+</html>

@@ -175,11 +175,103 @@
 
 	<div id="past-glucose" class="" style="display: flex; background-color: #f8d7da; border-radius: 20px; align-items: center;">
 
-		<img src="icon/glucose.png" style="width: 100px; padding-left: 5vw; padding-top: 8px; padding-bottom: 8px;">
-		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; width: 150px;">Glucose</label>
-		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastglucosechart" style=""></canvas>
+		<div class="container" style="display: flex; align-items: center;">
+			<div class="icon-label" style="display: flex; flex-direction: column; align-items: center;">
+				<img src="icon/glucose.png" style="width: 100px; padding-top: 8px; padding-bottom: 8px;">
+				<label style="font-size: larger; font-weight: 500; margin-top: 8px;">Glucose</label>
+			</div>
+			<div class="chart" style="flex-grow: 1; padding-left: 20px;">
+				<canvas id="pastglucosechart"></canvas>
+			</div>
 		</div>
+		<script>
+			// Function to initialize and update the chart
+			function initializeChart() {
+				// Function to initialize a chart with specific settings
+				function createChart(canvasId, label, borderColor) {
+					// Set canvas dimensions
+					var canvas = document.getElementById(canvasId);
+					canvas.height = window.innerHeight * 0.20;
+					canvas.width = window.innerWidth * 0.4;
+
+					// Get the context and create the chart
+					var ctx = canvas.getContext('2d');
+					var chart = new Chart(ctx, {
+						type: 'line',
+						data: {
+							labels: [], // Time labels
+							datasets: [{
+								label: label,
+								data: [], // Data points
+								borderColor: borderColor,
+								fill: false,
+								pointRadius: 5, // Increase point size to make them visible
+							}]
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							scales: {
+								x: {
+									type: 'linear',
+									position: 'bottom',
+									title: {
+										display: true,
+										text: 'Time (s)'
+									}
+								},
+								y: {
+									beginAtZero: true,
+									title: {
+										display: true,
+										text: 'Value'
+									}
+								}
+							}
+						}
+					});
+
+					// Function to add new data points every 15 seconds
+					var time = 0; // Initialize time counter
+					function addDataPoint() {
+						time += 15; // Increment time by 15 seconds
+						var newDataValue = Math.floor(Math.random() * 100); // Simulate a new data value
+
+						chart.data.labels.push(time); // Add the time to the labels array
+						chart.data.datasets[0].data.push(newDataValue); // Add the new data value to the dataset
+
+						// Update the chart to reflect the new data
+						chart.update();
+					}
+
+					// Add a new data point every 15 seconds
+					setInterval(addDataPoint, 15000);
+
+					// Add the first data point immediately
+					addDataPoint();
+
+					// Recalculate chart size when window is resized
+					window.addEventListener('resize', function() {
+						canvas.height = window.innerHeight * 0.20;
+						canvas.width = window.innerWidth * 0.4;
+						chart.resize();
+					});
+
+					return chart;
+				}
+
+				// Initialize each chart with the specific color and label
+				var glucoseChart = createChart('pastglucosechart', 'Glucose Data', 'pink');
+				var lactateChart = createChart('pastlactatechart', 'Lactate Data', 'lightblue');
+				var vitaminCChart = createChart('pastvitaminchart', 'Vitamin C Data', 'lightgreen');
+			}
+
+
+
+			window.onload = function() {
+				initializeChart();
+			};
+		</script>
 		
 		
 		
@@ -187,10 +279,12 @@
 
 	<div id="past-lactate" class="" style="display: flex; background-color: #cce5ff; border-radius: 20px; align-items: center;">
 
-		<img src="icon/lactate.gif" style="width: 100px; padding-left: 5vw;">
-		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500;width: 150px;">Lactate</label>
-		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastlactatechart" style=""></canvas>
+		<div class="icon-label" style="display: flex; flex-direction: column; align-items: center;">
+			<img src="icon/lactate.gif" style="width: 100px;">
+			<label style="font-size: larger; font-weight: 500; margin-top: 8px;">Lactate</label>
+		</div>
+		<div class="chart" style="flex-grow: 1; padding-left: 20px;">
+			<canvas id="pastlactatechart"></canvas>
 		</div>
 		
 		
@@ -200,10 +294,12 @@
 
 	<div id="past-vita-c" class="" style="display: flex; background-color: #d4edda; border-radius: 20px; align-items: center; padding: 10px;">
 
-		<img src="icon/vitaminC.png" style="width: 100px; padding-left: 5vw;">
-		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; white-space: nowrap; width: 150px;">Vita-C</label>
-		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastvitaminchart" style=""></canvas>
+		<div class="icon-label" style="display: flex; flex-direction: column; align-items: center;">
+			<img src="icon/vitaminC.png" style="width: 100px;">
+			<label style="font-size: larger; font-weight: 500; margin-top: 8px;">Vita-C</label>
+		</div>
+		<div class="chart" style="flex-grow: 1; padding-left: 20px;">
+			<canvas id="pastvitaminchart"></canvas>
 		</div>
 		
 		
@@ -212,11 +308,16 @@
 
 	<div id="past-l-dopa" class="" style="display: flex; background-color: #fff3cd; border-radius: 20px; align-items: center; padding: 10px;">
 
-		<img src="icon/ldopa.png" style="width: 100px; padding-left: 5vw;">
-		<label style="padding-left: 5vw; padding-right: 4vw; font-size: larger; font-weight: 500; white-space: nowrap; width: 150px;">L-Dopa</label>
-		<div class="chart" style="padding-right: 5vw;">
-			<canvas id="pastldopachart" style=""></canvas>
+		<div class="container" style="display: flex; align-items: center; margin-bottom: 20px;">
+			<div class="icon-label" style="display: flex; flex-direction: column; align-items: center;">
+				<img src="icon/ldopa.png" style="width: 100px;">
+				<label style="font-size: larger; font-weight: 500; margin-top: 8px;">L-Dopa</label>
+			</div>
+			<div class="chart" style="flex-grow: 1; padding-left: 20px;">
+				<canvas id="pastldopachart"></canvas>
+			</div>
 		</div>
+		
 		
 		
 		

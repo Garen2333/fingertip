@@ -476,6 +476,8 @@ function processDataFromCSV(rawData) {
     simulateRealTimeData(dataset);
 }
 
+
+
 // Function to simulate real-time data by appending new values every 30 seconds
 function simulateRealTimeData(dataset) {
     setInterval(() => {
@@ -500,7 +502,7 @@ function simulateRealTimeData(dataset) {
         } else {
             console.log("End of data stream.");
         }
-    }, 1000); // 30000 milliseconds = 30 seconds
+    }, 15000);
 }
 
 // Function to update stats and UI
@@ -763,7 +765,7 @@ function createTimeline() {
     });
 
     glucose_chart.streamTo(document.getElementById("glucosechart"));
-    past_glucose_chart.streamTo(document.getElementById("pastglucosechart"));
+  
 
 
     lactate_chart.streamTo(document.getElementById("lactatechart"));
