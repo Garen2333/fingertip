@@ -422,37 +422,88 @@ function incomingData(event) {
     }
 }
 // Arrays to hold the data for each channel
+
 let glucoseData = [];
 let lactateData = [];
 let vitaminCData = [];
-
-// Index to keep track of the current position in the CSV data
 let currentIndex = 0;
+let charts = {};
+
+function initializeChart() {
+    // Function to initialize a chart with specific settings
+    function createChart(canvasId, label, borderColor) {
+        // Set canvas dimensions
+        var canvas = document.getElementById(canvasId);
+        canvas.height = window.innerHeight * 0.20;
+        canvas.width = window.innerWidth * 0.4;
+
+        // Get the context and create the chart
+        var ctx = canvas.getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Time labels
+                datasets: [{
+                    label: label,
+                    data: [], // Data points
+                    borderColor: borderColor,
+                    fill: false,
+                    pointRadius: 5, // Increase point size to make them visible
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Time (s)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Recalculate chart size when window is resized
+        window.addEventListener('resize', function() {
+            canvas.height = window.innerHeight * 0.20;
+            canvas.width = window.innerWidth * 0.4;
+            chart.resize();
+        });
+
+        return chart;
+    }
+
+    // Initialize each chart with the specific color and label
+    
+    charts.glucoseChart = createChart('pastglucosechart', 'Glucose Data', 'pink');
+    charts.lactateChart = createChart('pastlactatechart', 'Lactate Data', 'lightblue');
+    charts.vitaminCChart = createChart('pastvitaminchart', 'Vitamin C Data', 'lightgreen');
+}
 
 // Function to process and store CSV data in an array
 function processDataFromCSV(rawData) {
-    // Split the data into lines
     let lines = rawData.split('\n');
-
-    // Assuming the first line contains headers
     let headers = lines[0].split(',').map(header => header.trim());
 
-    // Debug: log the headers to ensure they are correctly processed
-    console.log("Headers:", headers);
-
-    // Find the indices of the required columns
     let ch0Index = headers.indexOf('glu');
     let ch1Index = headers.indexOf('la');
     let ch2Index = headers.indexOf('vc');
 
-    // Debug: log the indices to ensure they are correct
-    console.log("Index of 'glu':", ch0Index, "Index of 'la':", ch1Index, "Index of 'vc':", ch2Index);
-
-    // Create a dataset from the CSV lines
     let dataset = [];
     for (let i = 1; i < lines.length; i++) {
         let line = lines[i].trim();
-        if (line === '') continue; // Skip empty lines
+        if (line === '') continue;
 
         let parts = line.split(',');
 
@@ -462,9 +513,6 @@ function processDataFromCSV(rawData) {
         let ch1Value = ch1Index >= 0 ? parseFloat(parts[ch1Index].trim()) : NaN;
         let ch2Value = ch2Index >= 0 ? parseFloat(parts[ch2Index].trim()) : NaN;
 
-        // Debug: log the values for each line to ensure correct parsing
-        console.log(`Line ${i}: glu = ${ch0Value}, la = ${ch1Value}, vc = ${ch2Value}`);
-
         dataset.push({
             ch0Value,
             ch1Value,
@@ -472,41 +520,11 @@ function processDataFromCSV(rawData) {
         });
     }
 
-    // Start the simulation
     simulateRealTimeData(dataset);
 }
 
-
-
-// Function to simulate real-time data by appending new values every 30 seconds
-function simulateRealTimeData(dataset) {
-    setInterval(() => {
-        if (currentIndex < dataset.length) {
-            let dataPoint = dataset[currentIndex];
-
-            // Append data to the arrays
-            if (!isNaN(dataPoint.ch0Value)) {
-                glucoseData.push(dataPoint.ch0Value);
-                updateStatsAndUI('CH0', glucoseData);
-            }
-            if (!isNaN(dataPoint.ch1Value)) {
-                lactateData.push(dataPoint.ch1Value);
-                updateStatsAndUI('CH1', lactateData);
-            }
-            if (!isNaN(dataPoint.ch2Value)) {
-                vitaminCData.push(dataPoint.ch2Value);
-                updateStatsAndUI('CH2', vitaminCData);
-            }
-
-            currentIndex++;
-        } else {
-            console.log("End of data stream.");
-        }
-    }, 15000);
-}
-
 // Function to update stats and UI
-function updateStatsAndUI(channel, dataArray) {
+function updateStatsAndUI(channel, dataArray, chart) {
     let channelStats = stats[channel];
 
     let latestValue = dataArray[dataArray.length - 1];
@@ -542,7 +560,42 @@ function updateStatsAndUI(channel, dataArray) {
             graphRaw(0, 0, latestValue);
             break;
     }
+    
+    let time = chart.data.labels.length * 15;
+
+    chart.data.labels.push(time); // Add the time to the labels array
+    chart.data.datasets[0].data.push(latestValue); // Add the new data value to the dataset
+
+    chart.update(); // Update the chart
 }
+
+// Function to simulate real-time data by appending new values every 15 seconds
+function simulateRealTimeData(dataset) {
+    setInterval(() => {
+        if (currentIndex < dataset.length) {
+            let dataPoint = dataset[currentIndex];
+
+            // Update charts with real data
+            if (!isNaN(dataPoint.ch0Value)) {
+                glucoseData.push(dataPoint.ch0Value);
+                updateStatsAndUI('CH0', glucoseData, charts.glucoseChart);
+            }
+            if (!isNaN(dataPoint.ch1Value)) {
+                lactateData.push(dataPoint.ch1Value);
+                updateStatsAndUI('CH1', lactateData, charts.lactateChart);
+            }
+            if (!isNaN(dataPoint.ch2Value)) {
+                vitaminCData.push(dataPoint.ch2Value);
+                updateStatsAndUI('CH2', vitaminCData, charts.vitaminCChart);
+            }
+
+            currentIndex++;
+        } else {
+            console.log("End of data stream.");
+        }
+    }, 1000);
+}
+
 
 
 
@@ -659,6 +712,7 @@ async function ble_connect() {
 
 function startProcess(){
     createTimeline();
+
     fetch('data/data.csv')
     .then(response => response.text())
     .then(data => processDataFromCSV(data))
@@ -769,16 +823,16 @@ function createTimeline() {
 
 
     lactate_chart.streamTo(document.getElementById("lactatechart"));
-    past_lactate_chart.streamTo(document.getElementById("pastlactatechart"));
+  
 
 
     vitamin_chart.streamTo(document.getElementById("vitaminchart"));
-    past_vitamin_chart.streamTo(document.getElementById("pastvitaminchart"));
+    
 
 
 
     ldopa_chart.streamTo(document.getElementById("ldopachart"));
-    past_ldopa_chart.streamTo(document.getElementById("pastldopachart"));
+    
 
 
 }
