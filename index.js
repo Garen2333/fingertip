@@ -593,7 +593,7 @@ function simulateRealTimeData(dataset) {
         } else {
             console.log("End of data stream.");
         }
-    }, 1000);
+    }, 15000);
 }
 
 
