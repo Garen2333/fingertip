@@ -421,6 +421,129 @@ function incomingData(event) {
         }
     }
 }
+// Arrays to hold the data for each channel
+let glucoseData = [];
+let lactateData = [];
+let vitaminCData = [];
+
+// Index to keep track of the current position in the CSV data
+let currentIndex = 0;
+
+// Function to process and store CSV data in an array
+function processDataFromCSV(rawData) {
+    // Split the data into lines
+    let lines = rawData.split('\n');
+
+    // Assuming the first line contains headers
+    let headers = lines[0].split(',').map(header => header.trim());
+
+    // Debug: log the headers to ensure they are correctly processed
+    console.log("Headers:", headers);
+
+    // Find the indices of the required columns
+    let ch0Index = headers.indexOf('glu');
+    let ch1Index = headers.indexOf('la');
+    let ch2Index = headers.indexOf('vc');
+
+    // Debug: log the indices to ensure they are correct
+    console.log("Index of 'glu':", ch0Index, "Index of 'la':", ch1Index, "Index of 'vc':", ch2Index);
+
+    // Create a dataset from the CSV lines
+    let dataset = [];
+    for (let i = 1; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line === '') continue; // Skip empty lines
+
+        let parts = line.split(',');
+
+        if (parts.length <= Math.max(ch0Index, ch1Index, ch2Index)) continue;
+
+        let ch0Value = ch0Index >= 0 ? parseFloat(parts[ch0Index].trim()) : NaN;
+        let ch1Value = ch1Index >= 0 ? parseFloat(parts[ch1Index].trim()) : NaN;
+        let ch2Value = ch2Index >= 0 ? parseFloat(parts[ch2Index].trim()) : NaN;
+
+        // Debug: log the values for each line to ensure correct parsing
+        console.log(`Line ${i}: glu = ${ch0Value}, la = ${ch1Value}, vc = ${ch2Value}`);
+
+        dataset.push({
+            ch0Value,
+            ch1Value,
+            ch2Value
+        });
+    }
+
+    // Start the simulation
+    simulateRealTimeData(dataset);
+}
+
+// Function to simulate real-time data by appending new values every 30 seconds
+function simulateRealTimeData(dataset) {
+    setInterval(() => {
+        if (currentIndex < dataset.length) {
+            let dataPoint = dataset[currentIndex];
+
+            // Append data to the arrays
+            if (!isNaN(dataPoint.ch0Value)) {
+                glucoseData.push(dataPoint.ch0Value);
+                updateStatsAndUI('CH0', glucoseData);
+            }
+            if (!isNaN(dataPoint.ch1Value)) {
+                lactateData.push(dataPoint.ch1Value);
+                updateStatsAndUI('CH1', lactateData);
+            }
+            if (!isNaN(dataPoint.ch2Value)) {
+                vitaminCData.push(dataPoint.ch2Value);
+                updateStatsAndUI('CH2', vitaminCData);
+            }
+
+            currentIndex++;
+        } else {
+            console.log("End of data stream.");
+        }
+    }, 1000); // 30000 milliseconds = 30 seconds
+}
+
+// Function to update stats and UI
+function updateStatsAndUI(channel, dataArray) {
+    let channelStats = stats[channel];
+
+    let latestValue = dataArray[dataArray.length - 1];
+    channelStats.sum += latestValue;
+    channelStats.count = dataArray.length;
+    channelStats.max = Math.max(...dataArray);
+    channelStats.min = Math.min(...dataArray);
+
+    let meanValue = (channelStats.sum / channelStats.count).toFixed(2);
+
+    switch(channel) {
+        case 'CH0':
+            document.getElementById('glucoseCur').innerHTML = latestValue;
+            document.getElementById('glucoseMax').innerHTML = channelStats.max;
+            document.getElementById('glucoseMean').innerHTML = meanValue;
+            document.getElementById('glucoseMin').innerHTML = channelStats.min;
+            graphRaw(latestValue, 0, 0);
+            break;
+
+        case 'CH1':
+            document.getElementById('lactateCur').innerHTML = latestValue;
+            document.getElementById('lactateMax').innerHTML = channelStats.max;
+            document.getElementById('lactateMean').innerHTML = meanValue;
+            document.getElementById('lactateMin').innerHTML = channelStats.min;
+            graphRaw(0, latestValue, 0);
+            break;
+
+        case 'CH2':
+            document.getElementById('vitamincCur').innerHTML = latestValue;
+            document.getElementById('vitamincMax').innerHTML = channelStats.max;
+            document.getElementById('vitamincMean').innerHTML = meanValue;
+            document.getElementById('vitamincMin').innerHTML = channelStats.min;
+            graphRaw(0, 0, latestValue);
+            break;
+    }
+}
+
+
+
 
 function parseProcessed(data) {
     var time = new Date();
@@ -519,8 +642,9 @@ async function ble_connect() {
           }, "10000");
         // Subscribe to notifications
         log("connected");
-        await flowcontrolChar.startNotifications();
-        flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData);
+        /* await flowcontrolChar.startNotifications();
+        flowcontrolChar.addEventListener('characteristicvaluechanged', incomingData); */
+
         log('Ready to communicate!\n');
         createTimeline();
         //document.getElementById('chart-area').style = "display:inline;";
@@ -529,6 +653,14 @@ async function ble_connect() {
     catch (error) {
         log('Failed: ' + error);
     }
+}
+
+function startProcess(){
+    createTimeline();
+    fetch('data/data.csv')
+    .then(response => response.text())
+    .then(data => processDataFromCSV(data))
+    .catch(error => console.error('Error reading CSV file:', error));
 }
 
 
